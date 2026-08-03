@@ -1,0 +1,128 @@
+.author-shell {
+  background: var(--cream-100);
+}
+
+.topbar {
+  background: var(--forest-900);
+  padding: 16px 0;
+}
+.topbar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.brand-mark {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.8);
+}
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  text-decoration: none;
+  color: #fff;
+  padding: 9px 16px;
+  min-height: 40px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  transition: background 0.2s ease;
+}
+.back-link:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.author-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+}
+
+.author-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  text-align: center;
+  max-width: 460px;
+}
+@media (min-width: 640px) {
+  .author-card {
+    flex-direction: row;
+    text-align: left;
+    padding: 36px;
+    max-width: 640px;
+  }
+}
+.author-avatar {
+  width: 104px;
+  height: 104px;
+  min-width: 104px;
+  border-radius: 50%;
+  background: linear-gradient(155deg, var(--marigold-500), var(--clay-600));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 2.1rem;
+  font-weight: 600;
+}
+.author-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-family: var(--font-display);
+}
+.author-role {
+  color: var(--marigold-600);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  margin-top: 4px;
+}
+.author-bio {
+  margin-top: 12px;
+  color: rgba(17, 18, 13, 0.7);
+  font-size: 0.94rem;
+}
+.author-socials {
+  margin-top: 16px;
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+}
+@media (min-width: 640px) {
+  .author-socials {
+    justify-content: flex-start;
+  }
+}
+.author-socials a {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+.author-socials a:hover {
+  background: var(--forest-700);
+  color: #fff;
+  transform: translateY(-2px);
+}
