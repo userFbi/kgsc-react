@@ -541,7 +541,7 @@
   font-size: 0.68rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(17, 18, 13, 0.55);
+  color: rgba(17, 18, 13, 0.55) !important;
 }
 
 .field select {
@@ -785,7 +785,7 @@
   font-size: 0.64rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(17, 18, 13, 0.5);
+  color: rgba(17, 18, 13, 0.5) ;
 }
 .detail-value {
   font-size: 0.96rem;

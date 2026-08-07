@@ -164,11 +164,11 @@
   gap: 6px;
 }
 
-.field label {
+.field .login-label{
   font-family: var(--font-mono);
   font-size: 0.7rem;
   letter-spacing: 0.08em;
-  text-transform: capitalize;
+  text-transform: uppercase;
   color: rgba(255, 255, 255, 0.55) !important;
 }
 
@@ -195,7 +195,7 @@
   min-height: 48px;
   font-family: var(--font-body);
   background: rgba(255, 255, 255, 0.05);
-  color: #fff;
+  color: #fff ;
   outline: none;
   transition:
     border 0.2s ease,

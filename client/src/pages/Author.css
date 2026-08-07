@@ -2,8 +2,8 @@
   background: var(--cream-100);
 }
 
-.topbar {
-  background: var(--forest-900);
+.author-topbar{
+  background: var(--forest-900) !important;
   padding: 16px 0;
 }
 .topbar-inner {

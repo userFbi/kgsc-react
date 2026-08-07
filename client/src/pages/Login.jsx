@@ -100,7 +100,7 @@ export default function Login() {
             autoComplete="off"
           >
             <div className="field">
-              <label htmlFor="loginUser">Email or username</label>
+              <label htmlFor="loginUser" className="login-label">Email or username</label>
               <div className="field-input-wrap">
                 <i className="bi bi-person-fill"></i>
                 <input
@@ -117,7 +117,7 @@ export default function Login() {
               <span className="field-error">{loginErrors.user}</span>
             </div>
             <div className="field">
-              <label htmlFor="loginPass">Password</label>
+              <label htmlFor="loginPass" className="login-label">Password</label>
               <div className="field-input-wrap">
                 <i className="bi bi-lock-fill"></i>
                 <input
@@ -151,7 +151,7 @@ export default function Login() {
             autoComplete="off"
           >
             <div className="field">
-              <label htmlFor="signupName">Full name</label>
+              <label htmlFor="signupName" className="login-label">Full name</label>
               <div className="field-input-wrap">
                 <i className="bi bi-person-fill"></i>
                 <input
@@ -168,7 +168,7 @@ export default function Login() {
               <span className="field-error">{signupErrors.name}</span>
             </div>
             <div className="field">
-              <label htmlFor="signupEmail">Email</label>
+              <label htmlFor="signupEmail" className="login-label">Email</label>
               <div className="field-input-wrap">
                 <i className="bi bi-envelope-fill"></i>
                 <input
@@ -185,7 +185,7 @@ export default function Login() {
               <span className="field-error">{signupErrors.email}</span>
             </div>
             <div className="field">
-              <label htmlFor="signupPass">Password</label>
+              <label htmlFor="signupPass" className="login-label">Password</label>
               <div className="field-input-wrap">
                 <i className="bi bi-lock-fill"></i>
                 <input
@@ -202,7 +202,7 @@ export default function Login() {
               <span className="field-error">{signupErrors.pass}</span>
             </div>
             <div className="field">
-              <label htmlFor="signupPhone">Phone number</label>
+              <label htmlFor="signupPhone" className="login-label">Phone number</label>
               <div className="field-input-wrap">
                 <i className="bi bi-telephone-fill"></i>
                 <input
@@ -222,7 +222,7 @@ export default function Login() {
               <span className="field-error">{signupErrors.phone}</span>
             </div>
             <div className="field">
-              <label htmlFor="signupAadhar">Aadhar card number</label>
+              <label htmlFor="signupAadhar" className="login-label">Aadhar card number</label>
               <div className="field-input-wrap">
                 <i className="bi bi-credit-card-2-front-fill"></i>
                 <input

@@ -1,0 +1,4 @@
+- HomePage : Repace Moments from the club with actual images or make slider of images.
+
+- create default email and password for Admin & Manager.
+- Adminpage : Make backend work.

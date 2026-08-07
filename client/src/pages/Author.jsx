@@ -5,7 +5,7 @@ import "./Author.css";
 export default function Author() {
   return (
     <div className="page-shell author-shell">
-      <div className="topbar">
+      <div className="author-topbar">
         <div className="wrap topbar-inner">
           <Link className="back-link" to="/">
             <i className="bi bi-arrow-left"></i> Back to KGSC
