@@ -764,3 +764,19 @@
   gap: 10px;
   margin-top: 26px;
 }
+
+.dash-panel {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.recent-row {
+  border-bottom: 1px solid var(--line);
+  border-radius: none;
+  padding: 14px 0;
+}

@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { loadTransactions } from "../data/transactionsStore.js";
+import Chart from "chart.js/auto";
 import "./Admin.css";
 
 function formatDate(iso) {
@@ -21,6 +22,8 @@ function formatINR(amount) {
 
 export default function Dashboard() {
   const [transactions, setTransactions] = useState([]);
+  const chartRef = useRef(null);
+  const chartInstance = useRef(null);
 
   useEffect(() => {
     setTransactions(loadTransactions());
@@ -34,18 +37,90 @@ export default function Dashboard() {
     const expense = transactions
       .filter((t) => t.type === "expense")
       .reduce((sum, t) => sum + Number(t.amount), 0);
-    const thisMonth = transactions.filter((t) => {
+
+    const thisMonthTxns = transactions.filter((t) => {
       const d = new Date(t.date);
-      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-    }).length;
-    return { income, expense, balance: income - expense, thisMonth };
+      return (
+        d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
+      );
+    });
+
+    const monthIncome = thisMonthTxns
+      .filter((t) => t.type === "income")
+      .reduce((sum, t) => sum + Number(t.amount), 0);
+    const monthExpense = thisMonthTxns
+      .filter((t) => t.type === "expense")
+      .reduce((sum, t) => sum + Number(t.amount), 0);
+
+    return {
+      income,
+      expense,
+      balance: income - expense,
+      thisMonth: thisMonthTxns.length,
+      monthIncome,
+      monthExpense,
+    };
   }, [transactions]);
 
   const recent = useMemo(
-    () => [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5),
+    () =>
+      [...transactions]
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .slice(0, 5),
     [transactions],
   );
 
+  // ---- Pie chart: Income vs Expense ----
+  useEffect(() => {
+    if (!chartRef.current || transactions.length === 0) return;
+
+    if (chartInstance.current) {
+      chartInstance.current.destroy();
+    }
+
+    chartInstance.current = new Chart(chartRef.current, {
+      type: "bar",
+      data: {
+        labels: ["Income", "Expense"],
+        datasets: [
+          {
+            data: [totals.income, totals.expense],
+            backgroundColor: ["#1f7a3a", "#a5341f"], // blue, orange
+            borderRadius: 8,
+            barThickness: 60,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => ` ${formatINR(ctx.raw)}`,
+            },
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: (val) => `₹${val.toLocaleString("en-IN")}`,
+            },
+            grid: { color: "#e5e7eb" },
+          },
+          x: {
+            grid: { display: false },
+          },
+        },
+      },
+    });
+
+    return () => {
+      if (chartInstance.current) chartInstance.current.destroy();
+    };
+  }, [transactions.length, totals.income, totals.expense]);
   return (
     <>
       <div className="admin-page-head">
@@ -82,6 +157,42 @@ export default function Dashboard() {
           </div>
           <div className="stat-num">{totals.thisMonth}</div>
           <div className="stat-label">Transactions this month</div>
+        </div>
+      </div>
+
+      {/* ============ INCOME VS EXPENSE PIE CHART ============ */}
+      <div className="dash-grid">
+        <div className="dash-panel dash-chart-panel">
+          <h2 className="dash-panel-title">
+            <i className="bi bi-pie-chart-fill"></i> Income vs Expense
+          </h2>
+          {transactions.length === 0 ? (
+            <p className="txn-empty">Add transactions to see this breakdown.</p>
+          ) : (
+            <div className="dash-chart-wrap dash-chart-wrap-pie">
+              <canvas ref={chartRef}></canvas>
+            </div>
+          )}
+        </div>
+
+        <div className="dash-panel">
+          <h2 className="dash-panel-title">
+            <i className="bi bi-bar-chart-fill"></i> Quick Breakdown
+          </h2>
+          <div className="recent-list">
+            <div className="recent-row">
+              <span className="recent-name">This month's income</span>
+              <span className="txn-id">{formatINR(totals.monthIncome)}</span>
+            </div>
+            <div className="recent-row">
+              <span className="recent-name">This month's expense</span>
+              <span className="txn-id">{formatINR(totals.monthExpense)}</span>
+            </div>
+            <div className="recent-row">
+              <span className="recent-name">Net balance</span>
+              <span className="txn-id">{formatINR(totals.balance)}</span>
+            </div>
+          </div>
         </div>
       </div>
 

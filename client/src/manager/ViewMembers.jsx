@@ -182,7 +182,7 @@ export default function ViewMembers() {
                   <tr>
                     <th>Member</th>
                     <th>Phone</th>
-                    <th>Joined</th>
+                    <th>Insurance</th>
                     <th></th>
                   </tr>
                 </thead>
@@ -194,7 +194,21 @@ export default function ViewMembers() {
                         <div className="member-id">{m.id}</div>
                       </td>
                       <td>{m.phone}</td>
-                      <td>{formatDate(m.joined)}</td>
+                      <td className="insurance-cell">
+                        {m.insurance ? (
+                          <i
+                            className="bi bi-check-circle-fill insurance-yes"
+                            aria-label="Insured"
+                            title="Insured"
+                          ></i>
+                        ) : (
+                          <i
+                            className="bi bi-x-circle-fill insurance-no"
+                            aria-label="Not insured"
+                            title="Not insured"
+                          ></i>
+                        )}
+                      </td>
                       <td className="row-actions">
                         <div className="row-actions-inner">
                           <button
@@ -306,6 +320,17 @@ export default function ViewMembers() {
                   <span className="detail-label">Joined</span>
                   <span className="detail-value">
                     {formatDate(viewingMember.joined)}
+                  </span>
+                </div>
+                <div className="detail-item">
+                  <span className="detail-label">Insurance</span>
+                  <span className="detail-value">
+                    {viewingMember.insurance ? (
+                      <i className="bi bi-check-circle-fill insurance-yes"></i>
+                    ) : (
+                      <i className="bi bi-x-circle-fill insurance-no"></i>
+                    )}{" "}
+                    {viewingMember.insurance ? "Insured" : "Not insured"}
                   </span>
                 </div>
                 <div className="detail-item detail-full">

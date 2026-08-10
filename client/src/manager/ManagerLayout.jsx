@@ -4,7 +4,7 @@ import "./ManagerLayout.css";
 
 const navItems = [
   { to: "/manager", label: "Dashboard", icon: "bi-grid-1x2-fill", end: true },
-  { to: "/manager/insurance-list", label : "Insurance List", icon : "bi-shield-shaded"},
+  { to: "/manager/insurance", label : "Insurance List", icon : "bi-shield-shaded"},
   { to: "/manager/members", label: "View Members", icon: "bi-people-fill" },
   { to: "/manager/add-member", label: "Add Member", icon: "bi-person-plus-fill" },
 ];

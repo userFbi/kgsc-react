@@ -1,7 +1,11 @@
 .login-shell {
   position: relative;
   background:
-    radial-gradient(circle at 85% 0%, rgba(216, 207, 188, 0.12), transparent 55%),
+    radial-gradient(
+      circle at 85% 0%,
+      rgba(216, 207, 188, 0.12),
+      transparent 55%
+    ),
     radial-gradient(circle at 5% 100%, rgba(86, 84, 73, 0.28), transparent 45%),
     linear-gradient(180deg, var(--forest-900) 0%, var(--forest-800) 100%);
 }
@@ -300,10 +304,21 @@
 }
 
 .google-btn-wrap {
+  width: 100%;
   display: flex;
   justify-content: center;
+  align-items: center;
+  margin-top: 2px;
 }
 
+.google-btn-wrap > div {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.google-btn-wrap iframe {
+  max-width: 100% !important;
+}
 
 .auth-api-error {
   background: rgba(255, 100, 80, 0.12);
@@ -335,11 +350,6 @@
   flex: 1;
   height: 1px;
   background: rgba(255, 255, 255, 0.14);
-}
-
-.google-btn-wrap {
-  display: flex;
-  justify-content: center;
 }
 
 .auth-api-error {
