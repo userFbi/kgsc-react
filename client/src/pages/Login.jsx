@@ -1,9 +1,18 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { GoogleLogin } from "@react-oauth/google";
 import "./Login.css";
 
+const API_URL = "http://localhost:5050/api/auth"; // change to your Render URL in production
+
 export default function Login() {
+  const [showLoginPass, setShowLoginPass] = useState(false);
+  const [showSignupPass, setShowSignupPass] = useState(false);
+  const [showConfirmPass, setShowConfirmPass] = useState(false);
+  const navigate = useNavigate();
   const [tab, setTab] = useState("login");
+  const [loading, setLoading] = useState(false);
+  const [apiError, setApiError] = useState("");
 
   const [loginData, setLoginData] = useState({ user: "", pass: "" });
   const [loginErrors, setLoginErrors] = useState({});
@@ -12,44 +21,114 @@ export default function Login() {
     name: "",
     email: "",
     pass: "",
+    confirmPass: "",
     phone: "",
     aadhar: "",
   });
   const [signupErrors, setSignupErrors] = useState({});
 
-  function handleLogin(e) {
+
+
+  function saveSessionAndRedirect(data) {
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("user", JSON.stringify(data.user));
+    navigate("/dashboard"); // change to your actual logged-in route
+  }
+
+  async function handleLogin(e) {
     e.preventDefault();
+    setApiError("");
     const errors = {};
-    if (!loginData.user.trim()) errors.user = "Enter your email or username.";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(loginData.user.trim()))
+      errors.user = "Enter a valid email.";
     if (!loginData.pass.trim()) errors.pass = "Enter your password.";
     setLoginErrors(errors);
     if (Object.keys(errors).length) return;
 
-    // TODO: replace with a real API call, then redirect based on role
-    // e.g. navigate("/manager");
-    alert("Login submitted — connect this to your backend.");
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_URL}/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: loginData.user.trim(),
+          password: loginData.pass,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setApiError(data.error || "Login failed.");
+        return;
+      }
+      saveSessionAndRedirect(data);
+    } catch (err) {
+      setApiError("Could not reach the server. Try again.");
+    } finally {
+      setLoading(false);
+    }
   }
 
-  function handleSignup(e) {
+  async function handleSignup(e) {
     e.preventDefault();
+    setApiError("");
     const errors = {};
     if (!signupData.name.trim()) errors.name = "Enter your full name.";
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(signupData.email.trim()))
       errors.email = "Enter a valid email.";
     if (signupData.pass.trim().length < 6)
       errors.pass = "Password must be at least 6 characters.";
+    if (signupData.confirmPass !== signupData.pass)
+      errors.confirmPass = "Passwords do not match.";
     if (!/^[0-9]{10}$/.test(signupData.phone.trim()))
       errors.phone = "Enter a valid 10-digit phone number.";
-    if (!/^[0-9]{12}$/.test(signupData.aadhar.trim()))
-      errors.aadhar = "Enter a valid 12-digit Aadhar number.";
     setSignupErrors(errors);
     if (Object.keys(errors).length) return;
 
-    // TODO: replace with a real API call to create the account.
-    // Handle the Aadhar number as sensitive personal data: send it only
-    // over HTTPS, avoid logging it, and store it encrypted at rest per
-    // applicable data-protection requirements.
-    alert("Sign-up submitted — connect this to your backend.");
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_URL}/signup`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fullName: signupData.name.trim(),
+          email: signupData.email.trim(),
+          phone: signupData.phone.trim(),
+          password: signupData.pass,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setApiError(data.error || "Sign up failed.");
+        return;
+      }
+      saveSessionAndRedirect(data);
+    } catch (err) {
+      setApiError("Could not reach the server. Try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleGoogleSuccess(credentialResponse) {
+    setApiError("");
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_URL}/google`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ credential: credentialResponse.credential }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setApiError(data.error || "Google sign-in failed.");
+        return;
+      }
+      saveSessionAndRedirect(data);
+    } catch (err) {
+      setApiError("Could not reach the server. Try again.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -81,17 +160,19 @@ export default function Login() {
           <div className="auth-tabs">
             <button
               className={`auth-tab${tab === "login" ? " is-active" : ""}`}
-              onClick={() => setTab("login")}
+              onClick={() => { setTab("login"); setApiError(""); }}
             >
               Login
             </button>
             <button
               className={`auth-tab${tab === "signup" ? " is-active" : ""}`}
-              onClick={() => setTab("signup")}
+              onClick={() => { setTab("signup"); setApiError(""); }}
             >
               Sign up
             </button>
           </div>
+
+          {apiError && <p className="auth-api-error">{apiError}</p>}
 
           {/* LOGIN PANEL */}
           <form
@@ -100,7 +181,7 @@ export default function Login() {
             autoComplete="off"
           >
             <div className="field">
-              <label htmlFor="loginUser" className="login-label">Email or username</label>
+              <label htmlFor="loginUser" className="login-label">Email</label>
               <div className="field-input-wrap">
                 <i className="bi bi-person-fill"></i>
                 <input
@@ -122,7 +203,7 @@ export default function Login() {
                 <i className="bi bi-lock-fill"></i>
                 <input
                   id="loginPass"
-                  type="password"
+                  type={showLoginPass ? "text" : "password"}
                   autoComplete="current-password"
                   value={loginData.pass}
                   onChange={(e) =>
@@ -130,12 +211,35 @@ export default function Login() {
                   }
                   required
                 />
+                <button
+                  type="button"
+                  className="field-eye-toggle"
+                  onClick={() => setShowLoginPass((v) => !v)}
+                  tabIndex={-1}
+                  aria-label={showLoginPass ? "Hide password" : "Show password"}
+                >
+                  <i className={`bi ${showLoginPass ? "bi-eye-slash" : "bi-eye"}`}></i>
+                </button>
               </div>
               <span className="field-error">{loginErrors.pass}</span>
             </div>
-            <button type="submit" className="auth-submit">
-              Log in
+            <button type="submit" className="auth-submit" disabled={loading}>
+              {loading ? "Logging in..." : "Log in"}
             </button>
+
+            <div className="auth-divider"><span>or</span></div>
+
+            <div className="google-btn-wrap">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={() => setApiError("Google sign-in failed.")}
+                theme="filled_black"
+                shape="pill"
+                width="100%"
+                text="continue_with"
+              />
+            </div>
+
             <p className="auth-switch">
               New here?{" "}
               <button type="button" onClick={() => setTab("signup")}>
@@ -185,23 +289,6 @@ export default function Login() {
               <span className="field-error">{signupErrors.email}</span>
             </div>
             <div className="field">
-              <label htmlFor="signupPass" className="login-label">Password</label>
-              <div className="field-input-wrap">
-                <i className="bi bi-lock-fill"></i>
-                <input
-                  id="signupPass"
-                  type="password"
-                  autoComplete="new-password"
-                  value={signupData.pass}
-                  onChange={(e) =>
-                    setSignupData({ ...signupData, pass: e.target.value })
-                  }
-                  required
-                />
-              </div>
-              <span className="field-error">{signupErrors.pass}</span>
-            </div>
-            <div className="field">
               <label htmlFor="signupPhone" className="login-label">Phone number</label>
               <div className="field-input-wrap">
                 <i className="bi bi-telephone-fill"></i>
@@ -222,31 +309,75 @@ export default function Login() {
               <span className="field-error">{signupErrors.phone}</span>
             </div>
             <div className="field">
-              <label htmlFor="signupAadhar" className="login-label">Aadhar card number</label>
+              <label htmlFor="signupPass" className="login-label">Password</label>
               <div className="field-input-wrap">
-                <i className="bi bi-credit-card-2-front-fill"></i>
+                <i className="bi bi-lock-fill"></i>
                 <input
-                  id="signupAadhar"
-                  type="text"
-                  inputMode="numeric"
-                  maxLength={12}
-                  placeholder="12-digit Aadhar number"
-                  autoComplete="off"
-                  value={signupData.aadhar}
+                  id="signupPass"
+                  type={showSignupPass ? "text" : "password"}
+                  autoComplete="new-password"
+                  value={signupData.pass}
                   onChange={(e) =>
-                    setSignupData({ ...signupData, aadhar: e.target.value })
+                    setSignupData({ ...signupData, pass: e.target.value })
                   }
                   required
                 />
+                <button
+                  type="button"
+                  className="field-eye-toggle"
+                  onClick={() => setShowSignupPass((v) => !v)}
+                  tabIndex={-1}
+                  aria-label={showSignupPass ? "Hide password" : "Show password"}
+                >
+                  <i className={`bi ${showSignupPass ? "bi-eye-slash" : "bi-eye"}`}></i>
+                </button>
               </div>
-              <span className="field-hint">
-                Used only to verify your identity as a club member.
-              </span>
-              <span className="field-error">{signupErrors.aadhar}</span>
+              <span className="field-error">{signupErrors.pass}</span>
             </div>
-            <button type="submit" className="auth-submit">
-              Create account
+
+            <div className="field">
+              <label htmlFor="signupConfirmPass" className="login-label">Confirm Password</label>
+              <div className="field-input-wrap">
+                <i className="bi bi-lock-fill"></i>
+                <input
+                  id="signupConfirmPass"
+                  type={showConfirmPass ? "text" : "password"}
+                  autoComplete="new-password"
+                  value={signupData.confirmPass}
+                  onChange={(e) =>
+                    setSignupData({ ...signupData, confirmPass: e.target.value })
+                  }
+                  required
+                />
+                <button
+                  type="button"
+                  className="field-eye-toggle"
+                  onClick={() => setShowConfirmPass((v) => !v)}
+                  tabIndex={-1}
+                  aria-label={showConfirmPass ? "Hide password" : "Show password"}
+                >
+                  <i className={`bi ${showConfirmPass ? "bi-eye-slash" : "bi-eye"}`}></i>
+                </button>
+              </div>
+              <span className="field-error">{signupErrors.confirmPass}</span>
+            </div>
+            <button type="submit" className="auth-submit" disabled={loading}>
+              {loading ? "Creating account..." : "Create account"}
             </button>
+
+            <div className="auth-divider"><span>or</span></div>
+
+            <div className="google-btn-wrap">
+              <GoogleLogin 
+                onSuccess={handleGoogleSuccess}
+                onError={() => setApiError("Google sign-in failed.")}
+                theme="filled_black"
+                shape="pill"
+                width="100%"
+                text="continue_with"
+              />
+            </div>
+
             <p className="auth-switch">
               Already have an account?{" "}
               <button type="button" onClick={() => setTab("login")}>

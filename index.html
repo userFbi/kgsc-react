@@ -1,0 +1,543 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kamlaba Garden Sport Club — You're Invited</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Anton&family=Work+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap"
+    rel="stylesheet" />
+  <style>
+    :root {
+      --forest: #1f3d2b;
+      --grass: #4c7a3d;
+      --sun: #e8a33d;
+      --cream: #f7f5ef;
+      --ink: #1a1a16;
+      --line: rgba(31, 61, 43, 0.16);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--cream);
+      color: var(--ink);
+      font-family: "Work Sans", sans-serif;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    .field-lines {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background-image: repeating-linear-gradient(90deg,
+          transparent,
+          transparent 79px,
+          var(--line) 79px,
+          var(--line) 80px);
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .field-lines::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 90% 60% at 50% -10%,
+          rgba(76, 122, 61, 0.1),
+          transparent 60%);
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 56px 24px 80px;
+    }
+
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: "Space Mono", monospace;
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--grass);
+      margin-bottom: 18px;
+      opacity: 0;
+      animation: rise 0.6s ease forwards;
+    }
+
+    .eyebrow .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--sun);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: var(--forest);
+      color: var(--cream);
+      font-family: "Anton", sans-serif;
+      font-size: 26px;
+      letter-spacing: 0.02em;
+      margin-bottom: 24px;
+      box-shadow: 0 0 0 6px rgba(31, 61, 43, 0.08);
+      opacity: 0;
+      animation: rise 0.6s ease 0.1s forwards;
+    }
+
+    h1 {
+      font-family: "Anton", sans-serif;
+      font-weight: 400;
+      font-size: clamp(40px, 9vw, 64px);
+      line-height: 0.98;
+      letter-spacing: 0.01em;
+      text-transform: uppercase;
+      color: var(--forest);
+      margin: 0 0 14px;
+      opacity: 0;
+      animation: rise 0.7s ease 0.15s forwards;
+    }
+
+    h1 span {
+      color: var(--grass);
+    }
+
+    .lede {
+      font-size: 17px;
+      line-height: 1.55;
+      color: rgba(26, 26, 22, 0.72);
+      max-width: 46ch;
+      margin: 0 0 40px;
+      opacity: 0;
+      animation: rise 0.7s ease 0.22s forwards;
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 32px;
+      box-shadow: 0 18px 40px -22px rgba(31, 61, 43, 0.35);
+      opacity: 0;
+      animation: rise 0.7s ease 0.3s forwards;
+    }
+
+    .card-label {
+      font-family: "Space Mono", monospace;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--grass);
+      margin-bottom: 6px;
+    }
+
+    .card-title {
+      font-family: "Anton", sans-serif;
+      font-weight: 400;
+      font-size: 22px;
+      text-transform: uppercase;
+      letter-spacing: 0.01em;
+      color: var(--forest);
+      margin: 0 0 22px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--forest);
+      margin-bottom: -8px;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 15px 16px;
+      border-radius: 10px;
+      border: 1.5px solid var(--line);
+      background: var(--cream);
+      font-family: "Work Sans", sans-serif;
+      font-size: 16px;
+      color: var(--ink);
+      outline: none;
+      transition:
+        border-color 0.15s ease,
+        background 0.15s ease;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus {
+      border-color: var(--grass);
+      background: #fff;
+    }
+
+    input[type="text"]:focus-visible,
+    input[type="number"]:focus-visible {
+      outline: 2px solid var(--grass);
+      outline-offset: 2px;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--grass);
+      background: #fff;
+    }
+
+    input[type="text"]:focus-visible {
+      outline: 2px solid var(--grass);
+      outline-offset: 2px;
+    }
+
+    button[type="submit"] {
+      margin-top: 6px;
+      padding: 16px 20px;
+      border: none;
+      border-radius: 10px;
+      background: var(--forest);
+      color: var(--cream);
+      font-family: "Work Sans", sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      transition:
+        transform 0.12s ease,
+        background 0.15s ease;
+    }
+
+    button[type="submit"]:hover {
+      background: var(--grass);
+    }
+
+    button[type="submit"]:active {
+      transform: scale(0.98);
+    }
+
+    button[type="submit"]:focus-visible {
+      outline: 2px solid var(--sun);
+      outline-offset: 2px;
+    }
+
+    button[type="submit"]:disabled {
+      opacity: 0.6;
+      cursor: default;
+    }
+
+    .error {
+      font-size: 13px;
+      color: #b23a2f;
+      display: none;
+    }
+
+    .error.show {
+      display: block;
+    }
+
+    .confirm {
+      display: none;
+      text-align: center;
+      padding: 8px 4px 4px;
+    }
+
+    .confirm.show {
+      display: block;
+    }
+
+    .confirm .num {
+      font-family: "Anton", sans-serif;
+      font-size: 40px;
+      color: var(--sun);
+      -webkit-text-stroke: 1.5px var(--forest);
+      color: transparent;
+      margin-bottom: 8px;
+    }
+
+    .confirm p {
+      font-size: 15px;
+      color: rgba(26, 26, 22, 0.72);
+      margin: 0;
+    }
+
+    .confirm strong {
+      color: var(--forest);
+    }
+
+    form.hide {
+      display: none;
+    }
+
+    footer {
+      margin-top: 44px;
+      font-family: "Space Mono", monospace;
+      font-size: 11.5px;
+      letter-spacing: 0.06em;
+      color: rgba(26, 26, 22, 0.4);
+      text-align: center;
+      line-height: 1.8;
+    }
+
+    footer a {
+      color: var(--grass);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(76, 122, 61, 0.35);
+      transition:
+        color 0.15s ease,
+        border-color 0.15s ease;
+    }
+
+    footer a:hover {
+      color: var(--sun);
+      border-color: var(--sun);
+    }
+
+    footer a:focus-visible {
+      outline: 2px solid var(--grass);
+      outline-offset: 2px;
+    }
+
+    @keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .wrap {
+        padding: 40px 18px 60px;
+      }
+
+      .card {
+        padding: 24px 20px;
+      }
+    }
+
+    .confirm .num {
+      font-family: "Anton", sans-serif;
+      font-size: 44px;
+      color: var(--sun);
+      margin-bottom: 6px;
+      line-height: 1;
+    }
+
+    .confirm p {
+      font-size: 15px;
+      color: rgba(26, 26, 22, 0.72);
+      margin: 0 0 4px;
+    }
+
+    .confirm strong {
+      color: var(--forest);
+    }
+
+    .wa-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 26px;
+      padding: 15px 26px;
+      border-radius: 999px;
+      background: #25D366;
+      color: #fff;
+      font-family: "Work Sans", sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      text-decoration: none;
+      box-shadow: 0 8px 20px -8px rgba(37, 211, 102, 0.6);
+      transition: transform 0.12s ease, background 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .wa-btn svg {
+      flex-shrink: 0;
+    }
+
+    .wa-btn:hover {
+      background: #20bd5a;
+      box-shadow: 0 10px 24px -8px rgba(37, 211, 102, 0.7);
+    }
+
+    .wa-btn:active {
+      transform: scale(0.97);
+    }
+
+    .wa-btn:focus-visible {
+      outline: 2px solid var(--forest);
+      outline-offset: 3px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="field-lines"></div>
+
+  <div class="wrap">
+    <div class="badge">KG<br /></div>
+    <h1>Kamlaba Garden<br /><span>Sport Club</span></h1>
+    <p class="lede">
+      Invites you to join us for the upcoming Janmastmi & Ganesh Chaturthi
+      festival.
+    </p>
+
+    <div class="card">
+      <h2 class="card-title" id="cardTitle">Enter your details</h2>
+
+      <form id="inviteForm">
+        <label for="nameInput">Full name</label>
+        <input type="text" id="nameInput" name="name" placeholder="e.g. Tushar Pawar" autocomplete="name" required />
+
+        <label for="ageInput">Age</label>
+        <input type="number" id="ageInput" name="age" placeholder="e.g. 25" min="6" max="79" required />
+
+        <label for="phoneInput">Phone number</label>
+        <input type="text" id="phoneInput" name="phone" placeholder="e.g. 98765 43210" autocomplete="tel"
+          inputmode="tel" required />
+
+        <label for="addressInput">Address</label>
+        <input type="text" id="addressInput" name="address" placeholder="e.g. Vesu, Surat" autocomplete="street-address"
+          required />
+
+        <div class="error" id="errorMsg">Please fill in all fields.</div>
+        <button type="submit" id="submitBtn">Join the group</button>
+      </form>
+
+      <div class="confirm" id="confirmBox">
+        <svg class="num" width="44" height="44" viewBox="0 0 24 24" fill="none" style="margin: 0 auto 10px;">
+          <circle cx="12" cy="12" r="11" stroke="#4c7a3d" stroke-width="1.5" />
+          <path d="M7 12.5L10.5 16L17 8.5" stroke="#1f3d2b" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+        <p style="margin-bottom: 10px">
+          You're in, <strong id="confirmName"></strong>.
+        </p>
+        <p>See you at Kamlaba Garden Sport Club!</p>
+        <a href="#" id="waBtn" class="wa-btn" target="_blank" rel="noopener">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2ZM12.04 3.67C14.25 3.67 16.32 4.53 17.89 6.1C19.45 7.67 20.31 9.74 20.31 11.92C20.31 16.46 16.58 20.17 12.03 20.17C10.56 20.17 9.12 19.78 7.85 19.04L7.55 18.87L4.43 19.7L5.28 16.66L5.08 16.34C4.27 15.03 3.84 13.5 3.84 11.91C3.85 7.37 7.5 3.67 12.04 3.67ZM8.53 6.85C8.37 6.85 8.1 6.91 7.88 7.15C7.66 7.39 7.03 7.98 7.03 9.19C7.03 10.4 7.9 11.56 8.02 11.72C8.14 11.88 9.71 14.44 12.19 15.44C14.26 16.28 14.68 16.11 15.13 16.07C15.58 16.03 16.57 15.49 16.77 14.93C16.98 14.37 16.98 13.89 16.92 13.79C16.86 13.69 16.7 13.63 16.46 13.51C16.22 13.39 15.03 12.8 14.81 12.72C14.59 12.64 14.43 12.6 14.27 12.84C14.11 13.08 13.65 13.63 13.51 13.79C13.37 13.95 13.23 13.97 12.99 13.85C12.75 13.73 11.97 13.47 11.04 12.65C10.32 12.01 9.83 11.22 9.69 10.98C9.55 10.74 9.67 10.61 9.79 10.49C9.9 10.38 10.03 10.2 10.15 10.06C10.27 9.92 10.31 9.82 10.39 9.66C10.47 9.5 10.43 9.36 10.37 9.24C10.31 9.12 9.83 7.93 9.61 7.44C9.42 7.02 9.22 6.99 9.05 6.98C8.9 6.97 8.72 6.85 8.53 6.85Z" />
+          </svg>
+          Chat on WhatsApp
+        </a>
+      </div>
+    </div>
+
+    <footer>
+      KAMLABA GARDEN SPORT CLUB — EST. <span id="currentYear"></span><br />Developed by
+      <a href="https://www.instagram.com/tushhar___">Tushar</a>
+    </footer>
+  </div>
+
+  <script>
+    document.getElementById("currentYear").textContent =
+      new Date().getFullYear();
+
+    const API_URL = "https://kgsc-server.onrender.com/api/submit";
+    const CLUB_WHATSAPP_NUMBER = "9725720612"; // 👈 replace with your KGSC WhatsApp number (country code + number, no + or spaces)
+
+    const form = document.getElementById("inviteForm");
+    const nameInput = document.getElementById("nameInput");
+    const phoneInput = document.getElementById("phoneInput");
+    const addressInput = document.getElementById("addressInput");
+    const ageInput = document.getElementById("ageInput");
+    const errorMsg = document.getElementById("errorMsg");
+    const submitBtn = document.getElementById("submitBtn");
+    const confirmBox = document.getElementById("confirmBox");
+    const confirmName = document.getElementById("confirmName");
+    const cardTitle = document.getElementById("cardTitle");
+    const waBtn = document.getElementById("waBtn");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = nameInput.value.trim();
+      const phone = phoneInput.value.trim();
+      const address = addressInput.value.trim();
+      const age = parseInt(ageInput.value, 10);
+
+      if (!name || !phone || !address || !ageInput.value) {
+        errorMsg.textContent = "Please fill in all fields.";
+        errorMsg.classList.add("show");
+        return;
+      }
+
+      if (isNaN(age) || age <= 5 || age >= 80) {
+        errorMsg.textContent = "Age must be between 6 and 79.";
+        errorMsg.classList.add("show");
+        return;
+      }
+
+      errorMsg.classList.remove("show");
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Joining…";
+
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, phone, address, age }),
+        });
+
+        if (!res.ok) throw new Error("Server error");
+
+        confirmName.textContent = name;
+        cardTitle.style.display = "none";
+        form.classList.add("hide");
+        confirmBox.classList.add("show");
+
+        
+        const waMessage = encodeURIComponent(
+          `Hi! I just registered for KGSC 🎉\n\n` +
+          `*Name:* ${name}\n` +
+          `*Age:* ${age}\n` +
+          `*Phone:* ${phone}\n` +
+          `*Address:* ${address}`
+        );
+        waBtn.href = `https://wa.me/${CLUB_WHATSAPP_NUMBER}?text=${waMessage}`;
+      } catch (err) {
+        errorMsg.textContent = "Something went wrong. Please try again.";
+        errorMsg.classList.add("show");
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Join the group";
+      }
+    });
+  </script>
+</body>
+
+</html>
