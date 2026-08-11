@@ -4,6 +4,18 @@ const { OAuth2Client } = require('google-auth-library');
 const User = require('../models/User');
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+const streamifier = require('streamifier');
+const cloudinary = require('../config/cloudinary');
+
+function uploadToCloudinary(buffer) {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder: 'kgsc/profile-photos' },
+      (err, result) => (err ? reject(err) : resolve(result))
+    );
+    streamifier.createReadStream(buffer).pipe(stream);
+  });
+}
 
 function generateToken(user) {
   return jwt.sign(
@@ -21,6 +33,10 @@ function userResponse(user) {
     phone: user.phone,
     role: user.role,
     authProvider: user.authProvider,
+    aadharNumber: user.aadharNumber,
+    address: user.address,
+    profilePhotoUrl: user.profilePhotoUrl,
+    isProfileComplete: user.isProfileComplete,
   };
 }
 
@@ -149,5 +165,76 @@ exports.getMe = async (req, res) => {
   } catch (err) {
     console.error('GetMe error:', err.message);
     res.status(500).json({ error: 'Failed to fetch user.' });
+  }
+};
+
+// ─────────────────────────────────────────────
+// PATCH /api/auth/complete-profile  (protected)
+// ─────────────────────────────────────────────
+exports.completeProfile = async (req, res) => {
+  try {
+    const { aadharNumber, address } = req.body;
+
+    if (!aadharNumber || !/^\d{12}$/.test(aadharNumber)) {
+      return res.status(400).json({ error: 'Enter a valid 12-digit Aadhar number.' });
+    }
+    if (!address || !address.trim()) {
+      return res.status(400).json({ error: 'Address is required.' });
+    }
+
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ error: 'User not found.' });
+
+    if (req.file) {
+      const result = await uploadToCloudinary(req.file.buffer);
+      user.profilePhotoUrl = result.secure_url;
+    }
+
+    user.aadharNumber = aadharNumber;
+    user.address = address.trim();
+    user.isProfileComplete = true;
+
+    await user.save();
+
+    res.status(200).json({ success: true, user: userResponse(user) });
+  } catch (err) {
+    console.error('Complete profile error:', err.message);
+    res.status(500).json({ error: 'Failed to update profile.' });
+  }
+};
+
+// ─────────────────────────────────────────────
+// PATCH /api/auth/profile  (protected) — edit any profile field
+// ─────────────────────────────────────────────
+exports.updateProfile = async (req, res) => {
+  try {
+    const { fullName, phone, address, aadharNumber } = req.body;
+
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ error: 'User not found.' });
+
+    if (req.file) {
+      const result = await uploadToCloudinary(req.file.buffer);
+      user.profilePhotoUrl = result.secure_url;
+    }
+
+    if (fullName !== undefined && fullName.trim()) user.fullName = fullName.trim();
+    if (phone !== undefined) user.phone = phone.trim();
+    if (address !== undefined) user.address = address.trim();
+
+    if (aadharNumber !== undefined && aadharNumber !== '') {
+      if (!/^\d{12}$/.test(aadharNumber)) {
+        return res.status(400).json({ error: 'Enter a valid 12-digit Aadhar number.' });
+      }
+      user.aadharNumber = aadharNumber;
+    }
+
+    if (user.aadharNumber && user.address) user.isProfileComplete = true;
+
+    await user.save();
+    res.status(200).json({ success: true, user: userResponse(user) });
+  } catch (err) {
+    console.error('Update profile error:', err.message);
+    res.status(500).json({ error: 'Failed to update profile.' });
   }
 };

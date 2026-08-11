@@ -42,6 +42,24 @@ const userSchema = new mongoose.Schema(
       enum: ['user', 'manager', 'admin'],
       default: 'user',
     },
+    aadharNumber: {
+      type: String,
+      default: null,
+    },
+    address: {
+      address: {
+        type: String,
+        default: null,
+      },
+    },
+    profilePhotoUrl: {
+      type: String,
+      default: null,
+    },
+    isProfileComplete: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

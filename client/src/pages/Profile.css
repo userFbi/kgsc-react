@@ -1,0 +1,338 @@
+.pf-page {
+    min-height: 100vh;
+    background: #fffaf0;
+    /* padding: 20px; */
+    display: flex;
+    justify-content: center;
+    font-family: var(--font-body);
+    color: var(--forest-900);
+}
+
+.pf-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    width: 100%;
+}
+
+.pf-spinner {
+    width: 28px;
+    height: 28px;
+    border: 3px solid var(--line);
+    border-top-color: var(--marigold-500);
+    border-radius: 50%;
+    animation: pf-spin 0.7s linear infinite;
+}
+
+@keyframes pf-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.pf-wrap {
+    width: 100%;
+    max-width: 460px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.pf-back {
+    margin-top: 10px;
+    margin-left: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    align-self: flex-start;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 9px 16px;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--forest-900);
+    cursor: pointer;
+}
+
+.pf-back:hover {
+    border-color: var(--marigold-500);
+    color: var(--marigold-600);
+}
+
+.pf-card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    /* border-radius: var(--radius-lg); */
+    padding: 26px 22px;
+    box-shadow: var(--shadow-soft);
+}
+
+.pf-title {
+    margin: 0 0 4px;
+    font-size: 1.35rem;
+    font-weight: 600;
+}
+
+.pf-sub {
+    margin: 0;
+    font-size: 0.85rem;
+    color: rgba(17, 18, 13, 0.55);
+}
+
+.pf-head-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 22px;
+}
+
+.pf-edit-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    flex-shrink: 0;
+    background: var(--marigold-500);
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    padding: 9px 16px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.pf-edit-btn:hover {
+    background: var(--marigold-600);
+}
+
+
+.pf-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.pf-list-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--line);
+}
+
+.pf-list-row:last-child {
+    border-bottom: none;
+}
+
+.pf-list-icon {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--cream-100);
+    border-radius: 50%;
+    color: var(--marigold-600);
+    font-size: 0.9rem;
+}
+
+.pf-list-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.pf-list-text>span:first-child {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(17, 18, 13, 0.4);
+}
+
+.pf-list-value {
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: var(--forest-900);
+}
+
+.pf-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 6px;
+}
+
+.pf-cancel-btn {
+    flex: 1;
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--forest-900);
+    cursor: pointer;
+}
+
+.pf-cancel-btn:hover:not(:disabled) {
+    border-color: var(--marigold-500);
+}
+
+.pf-cancel-btn:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
+.pf-error {
+    background: rgba(217, 79, 79, 0.1);
+    border: 1px solid rgba(217, 79, 79, 0.3);
+    color: #b03a3a;
+    font-size: 0.82rem;
+    padding: 10px 14px;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+.pf-success {
+    background: rgba(63, 145, 66, 0.1);
+    border: 1px solid rgba(63, 145, 66, 0.3);
+    color: #2d7a30;
+    font-size: 0.82rem;
+    padding: 10px 14px;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+.pf-photo-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.pf-photo-circle {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--cream-100);
+    border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(17, 18, 13, 0.25);
+    font-size: 2.2rem;
+}
+
+.pf-photo-circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.pf-photo-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--marigold-500);
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    padding: 9px 18px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.pf-photo-btn:hover {
+    background: var(--marigold-600);
+}
+
+.pf-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 16px;
+}
+
+.pf-field label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(17, 18, 13, 0.5);
+}
+
+.pf-field input,
+.pf-field textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-family: var(--font-body);
+    background: var(--cream-100);
+    color: var(--forest-900);
+    outline: none;
+}
+
+.pf-field input:focus,
+.pf-field textarea:focus {
+    border-color: var(--marigold-500);
+}
+
+.pf-field input:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.pf-hint {
+    font-size: 0.72rem;
+    color: rgba(17, 18, 13, 0.4);
+}
+
+.pf-save-btn {
+    flex: 2;
+    background: var(--marigold-500);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 14px 20px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+.pf-save-btn:hover:not(:disabled) {
+    background: var(--marigold-600);
+}
+
+.pf-save-btn:disabled {
+    opacity: 0.7;
+    cursor: default;
+}
+
+.pf-notice {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(240, 165, 0, 0.1);
+    border: 1px solid rgba(240, 165, 0, 0.3);
+    color: var(--marigold-600);
+    font-size: 0.82rem;
+    padding: 12px 14px;
+    border-radius: 10px;
+    margin-bottom: 18px;
+}
+
+.pf-notice i {
+    flex-shrink: 0;
+    font-size: 0.95rem;
+}

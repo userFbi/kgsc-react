@@ -18,7 +18,9 @@ import AdminDashboard from "./admin/Dashboard.jsx";
 import Reports from "./admin/Reports.jsx";
 import AddTransaction from "./admin/AddTransaction.jsx";
 import UserDashboard from "./pages/UserDashboard.jsx";
-
+import CompleteProfile from "./pages/CompleteProfile";
+import Profile from "./pages/Profile";
+// ...
 export default function App() {
   return (
     <BrowserRouter>
@@ -28,6 +30,8 @@ export default function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/location" element={<Location />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/complete-profile" element={<CompleteProfile />} />
+        <Route path="/profile" element={<Profile />} />
         <Route path="/author" element={<Author />} />
         <Route path="/dashboard" element={<UserDashboard />} />
 
