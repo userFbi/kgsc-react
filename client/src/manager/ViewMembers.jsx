@@ -325,11 +325,6 @@ export default function ViewMembers() {
                 <div className="detail-item">
                   <span className="detail-label">Insurance</span>
                   <span className="detail-value">
-                    {viewingMember.insurance ? (
-                      <i className="bi bi-check-circle-fill insurance-yes"></i>
-                    ) : (
-                      <i className="bi bi-x-circle-fill insurance-no"></i>
-                    )}{" "}
                     {viewingMember.insurance ? "Insured" : "Not insured"}
                   </span>
                 </div>

@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const { signup, login, googleLogin, getMe } = require('../controllers/authController');
 const { protect } = require('../middleware/auth');
 const upload = require('../middleware/upload');
 const { signup, login, googleLogin, getMe, completeProfile, updateProfile } = require('../controllers/authController');

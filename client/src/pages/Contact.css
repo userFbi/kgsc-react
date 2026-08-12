@@ -178,12 +178,12 @@
   flex-direction: column;
   gap: 6px;
 }
-.field label {
+.field .book-label {
   font-family: var(--font-mono);
   font-size: 0.7rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.55) !important;
 }
 .join-form input,
 .join-form textarea {

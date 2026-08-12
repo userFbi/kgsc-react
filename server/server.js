@@ -16,8 +16,9 @@ app.use(cors());
 app.use(express.json());
 
 app.get('/health', (req, res) => res.status(200).send('OK'));
-
 app.use('/api/auth', authRoutes);
+
+app.use("/api/manager", require("./routes/manager"));
 
 const PORT = process.env.PORT || 5050;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

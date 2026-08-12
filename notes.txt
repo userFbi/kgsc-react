@@ -1,0 +1,23 @@
+- HomePage : 
+        -make Members changeable from backend.
+        -Repace Moments from the club with actual images or make slider of images.
+        -join with us : make login fully workable(goggle login also).
+
+-ManagerPage : 
+        -correct Quick Breakdown text font style.         
+
+-AdminPage : 
+        -correct Quick Breakdown text font style.
+        -sidebar :
+            add settings button to handle small chnages from backend.
+            add manager page button to directly drive without login
+            add chat button to write text that will show on user's dashboard messages section.
+
+-profile : 
+        -change routes /dashboard , /profile to /dashboard/profile.
+        -make profile upload button workable.
+            
+
+- create default email and password for Admin & Manager.
+
+connect whole project with backend. 

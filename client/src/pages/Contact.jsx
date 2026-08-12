@@ -121,7 +121,7 @@ export default function Contact() {
 
             <form className="join-form" onSubmit={handleSubmit} noValidate>
               <div className="field">
-                <label htmlFor="fName">Full name</label>
+                <label htmlFor="fName" className="book-label">Full name</label>
                 <input
                   id="fName"
                   type="text"
@@ -134,7 +134,7 @@ export default function Contact() {
                 <span className="field-error">{errors.name}</span>
               </div>
               <div className="field">
-                <label htmlFor="fNumber">Your number</label>
+                <label htmlFor="fNumber" className="book-label">Your number</label>
                 <input
                   id="fNumber"
                   type="tel"
@@ -150,7 +150,7 @@ export default function Contact() {
                 <span className="field-error">{errors.number}</span>
               </div>
               <div className="field">
-                <label htmlFor="fAddress">Full address</label>
+                <label htmlFor="fAddress" className="book-label">Full address</label>
                 <textarea
                   id="fAddress"
                   placeholder="House no., street, area, city, pincode"
@@ -162,7 +162,7 @@ export default function Contact() {
                 <span className="field-error">{errors.address}</span>
               </div>
               <div className="field">
-                <label htmlFor="fMessage">Message</label>
+                <label htmlFor="fMessage" className="book-label">Message</label>
                 <textarea
                   id="fMessage"
                   placeholder="Any details about your Matki / Supari booking"

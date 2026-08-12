@@ -17,7 +17,6 @@ const userSchema = new mongoose.Schema(
     phone: {
       type: String,
       required: function () {
-        // phone not required for Google sign-ups (they may add it later)
         return this.authProvider === 'local';
       },
       trim: true,
@@ -47,10 +46,8 @@ const userSchema = new mongoose.Schema(
       default: null,
     },
     address: {
-      address: {
-        type: String,
-        default: null,
-      },
+      type: String,
+      default: null,
     },
     profilePhotoUrl: {
       type: String,

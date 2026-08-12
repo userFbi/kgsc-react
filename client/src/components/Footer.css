@@ -11,7 +11,9 @@
   padding-bottom: 40px;
   border-bottom: 1px solid var(--line-on-dark);
 }
-
+.wrap{
+  padding: 20px !important;
+}
 @media (max-width: 900px) {
   .footer-top {
     grid-template-columns: 1fr 1fr;
