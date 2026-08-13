@@ -26,12 +26,17 @@ export default function Login() {
   });
   const [signupErrors, setSignupErrors] = useState({});
 
-
-
   function saveSessionAndRedirect(data) {
     localStorage.setItem("token", data.token);
     localStorage.setItem("user", JSON.stringify(data.user));
-    navigate("/dashboard"); // change to your actual logged-in route
+
+    if (data.user.role === "admin") {
+      navigate("/admin");
+    } else if (data.user.role === "manager") {
+      navigate("/manager");
+    } else {
+      navigate("/dashboard");
+    }
   }
 
   async function handleLogin(e) {
@@ -134,9 +139,30 @@ export default function Login() {
     <div className="page-shell login-shell">
       <div className="bg-rings" aria-hidden="true">
         <svg viewBox="0 0 800 800" preserveAspectRatio="xMidYMid slice">
-          <circle cx="650" cy="120" r="300" fill="none" stroke="rgba(216,207,188,0.10)" strokeWidth="1.5" />
-          <circle cx="650" cy="120" r="210" fill="none" stroke="rgba(216,207,188,0.10)" strokeWidth="1.5" />
-          <circle cx="120" cy="700" r="240" fill="none" stroke="rgba(86,84,73,0.14)" strokeWidth="1.5" />
+          <circle
+            cx="650"
+            cy="120"
+            r="300"
+            fill="none"
+            stroke="rgba(216,207,188,0.10)"
+            strokeWidth="1.5"
+          />
+          <circle
+            cx="650"
+            cy="120"
+            r="210"
+            fill="none"
+            stroke="rgba(216,207,188,0.10)"
+            strokeWidth="1.5"
+          />
+          <circle
+            cx="120"
+            cy="700"
+            r="240"
+            fill="none"
+            stroke="rgba(86,84,73,0.14)"
+            strokeWidth="1.5"
+          />
         </svg>
       </div>
 
@@ -159,13 +185,19 @@ export default function Login() {
           <div className="auth-tabs">
             <button
               className={`auth-tab${tab === "login" ? " is-active" : ""}`}
-              onClick={() => { setTab("login"); setApiError(""); }}
+              onClick={() => {
+                setTab("login");
+                setApiError("");
+              }}
             >
               Login
             </button>
             <button
               className={`auth-tab${tab === "signup" ? " is-active" : ""}`}
-              onClick={() => { setTab("signup"); setApiError(""); }}
+              onClick={() => {
+                setTab("signup");
+                setApiError("");
+              }}
             >
               Sign up
             </button>
@@ -180,7 +212,9 @@ export default function Login() {
             autoComplete="off"
           >
             <div className="field">
-              <label htmlFor="loginUser" className="login-label">Email</label>
+              <label htmlFor="loginUser" className="login-label">
+                Email
+              </label>
               <div className="field-input-wrap">
                 <i className="bi bi-person-fill"></i>
                 <input
@@ -197,7 +231,9 @@ export default function Login() {
               <span className="field-error">{loginErrors.user}</span>
             </div>
             <div className="field">
-              <label htmlFor="loginPass" className="login-label">Password</label>
+              <label htmlFor="loginPass" className="login-label">
+                Password
+              </label>
               <div className="field-input-wrap">
                 <i className="bi bi-lock-fill"></i>
                 <input
@@ -217,7 +253,9 @@ export default function Login() {
                   tabIndex={-1}
                   aria-label={showLoginPass ? "Hide password" : "Show password"}
                 >
-                  <i className={`bi ${showLoginPass ? "bi-eye-slash" : "bi-eye"}`}></i>
+                  <i
+                    className={`bi ${showLoginPass ? "bi-eye-slash" : "bi-eye"}`}
+                  ></i>
                 </button>
               </div>
               <span className="field-error">{loginErrors.pass}</span>
@@ -226,7 +264,9 @@ export default function Login() {
               {loading ? "Logging in..." : "Log in"}
             </button>
 
-            <div className="auth-divider"><span>or</span></div>
+            <div className="auth-divider">
+              <span>or</span>
+            </div>
 
             <div className="google-btn-wrap">
               <GoogleLogin
@@ -254,7 +294,9 @@ export default function Login() {
             autoComplete="off"
           >
             <div className="field">
-              <label htmlFor="signupName" className="login-label">Full name</label>
+              <label htmlFor="signupName" className="login-label">
+                Full name
+              </label>
               <div className="field-input-wrap">
                 <i className="bi bi-person-fill"></i>
                 <input
@@ -271,7 +313,9 @@ export default function Login() {
               <span className="field-error">{signupErrors.name}</span>
             </div>
             <div className="field">
-              <label htmlFor="signupEmail" className="login-label">Email</label>
+              <label htmlFor="signupEmail" className="login-label">
+                Email
+              </label>
               <div className="field-input-wrap">
                 <i className="bi bi-envelope-fill"></i>
                 <input
@@ -288,7 +332,9 @@ export default function Login() {
               <span className="field-error">{signupErrors.email}</span>
             </div>
             <div className="field">
-              <label htmlFor="signupPhone" className="login-label">Phone number</label>
+              <label htmlFor="signupPhone" className="login-label">
+                Phone number
+              </label>
               <div className="field-input-wrap">
                 <i className="bi bi-telephone-fill"></i>
                 <input
@@ -308,7 +354,9 @@ export default function Login() {
               <span className="field-error">{signupErrors.phone}</span>
             </div>
             <div className="field">
-              <label htmlFor="signupPass" className="login-label">Password</label>
+              <label htmlFor="signupPass" className="login-label">
+                Password
+              </label>
               <div className="field-input-wrap">
                 <i className="bi bi-lock-fill"></i>
                 <input
@@ -326,16 +374,22 @@ export default function Login() {
                   className="field-eye-toggle"
                   onClick={() => setShowSignupPass((v) => !v)}
                   tabIndex={-1}
-                  aria-label={showSignupPass ? "Hide password" : "Show password"}
+                  aria-label={
+                    showSignupPass ? "Hide password" : "Show password"
+                  }
                 >
-                  <i className={`bi ${showSignupPass ? "bi-eye-slash" : "bi-eye"}`}></i>
+                  <i
+                    className={`bi ${showSignupPass ? "bi-eye-slash" : "bi-eye"}`}
+                  ></i>
                 </button>
               </div>
               <span className="field-error">{signupErrors.pass}</span>
             </div>
 
             <div className="field">
-              <label htmlFor="signupConfirmPass" className="login-label">Confirm Password</label>
+              <label htmlFor="signupConfirmPass" className="login-label">
+                Confirm Password
+              </label>
               <div className="field-input-wrap">
                 <i className="bi bi-lock-fill"></i>
                 <input
@@ -344,7 +398,10 @@ export default function Login() {
                   autoComplete="new-password"
                   value={signupData.confirmPass}
                   onChange={(e) =>
-                    setSignupData({ ...signupData, confirmPass: e.target.value })
+                    setSignupData({
+                      ...signupData,
+                      confirmPass: e.target.value,
+                    })
                   }
                   required
                 />
@@ -353,9 +410,13 @@ export default function Login() {
                   className="field-eye-toggle"
                   onClick={() => setShowConfirmPass((v) => !v)}
                   tabIndex={-1}
-                  aria-label={showConfirmPass ? "Hide password" : "Show password"}
+                  aria-label={
+                    showConfirmPass ? "Hide password" : "Show password"
+                  }
                 >
-                  <i className={`bi ${showConfirmPass ? "bi-eye-slash" : "bi-eye"}`}></i>
+                  <i
+                    className={`bi ${showConfirmPass ? "bi-eye-slash" : "bi-eye"}`}
+                  ></i>
                 </button>
               </div>
               <span className="field-error">{signupErrors.confirmPass}</span>
@@ -364,10 +425,12 @@ export default function Login() {
               {loading ? "Creating account..." : "Create account"}
             </button>
 
-            <div className="auth-divider"><span>or</span></div>
+            <div className="auth-divider">
+              <span>or</span>
+            </div>
 
             <div className="google-btn-wrap">
-              <GoogleLogin 
+              <GoogleLogin
                 onSuccess={handleGoogleSuccess}
                 onError={() => setApiError("Google sign-in failed.")}
                 theme="filled_black"

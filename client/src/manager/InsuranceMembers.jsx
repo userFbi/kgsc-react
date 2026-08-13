@@ -1,6 +1,5 @@
-import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
-import { loadMembers, updateMemberRecord } from "../data/membersStore.js";
+import { useEffect, useMemo, useState } from "react";
+import { api } from "../lib/api.js";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import "./Manager.css";
@@ -17,7 +16,7 @@ const RELATIONS = [
 ];
 
 export default function InsuranceMembers() {
-  const [members, setMembers] = useState(() => loadMembers());
+  const [members, setMembers] = useState([]);
 
   // search box used to find & add a member to insurance
   const [addQuery, setAddQuery] = useState("");
@@ -33,18 +32,24 @@ export default function InsuranceMembers() {
   // search box used to filter the insured members table
   const [listQuery, setListQuery] = useState("");
 
+  function refreshMembers() {
+    return api
+      .get("/api/manager/members")
+      .then((res) => setMembers(res.data))
+      .catch((err) => console.error("Failed to load members:", err.message));
+  }
+
+  useEffect(() => {
+    refreshMembers();
+  }, []);
+
   // ------- add-to-insurance search results (only non-insured members) -------
   const addResults = useMemo(() => {
     const q = addQuery.trim().toLowerCase();
     if (!q) return [];
     return members
       .filter((m) => !m.insurance)
-      .filter(
-        (m) =>
-          m.name.toLowerCase().includes(q) ||
-          m.phone.includes(q) ||
-          m.id.toLowerCase().includes(q),
-      )
+      .filter((m) => m.name.toLowerCase().includes(q) || m.phone.includes(q))
       .slice(0, 6);
   }, [members, addQuery]);
 
@@ -85,22 +90,24 @@ export default function InsuranceMembers() {
     return Object.keys(next).length === 0;
   }
 
-  function handleAddSubmit(e) {
+  async function handleAddSubmit(e) {
     e.preventDefault();
     if (!validateNominee()) return;
 
     setSaving(true);
-    const updated = updateMemberRecord(addTarget.id, {
-      insurance: true,
-      nominee: {
+    try {
+      await api.patch(`/api/manager/members/${addTarget._id}/insurance`, {
         name: nomineeForm.name.trim(),
         relation: nomineeForm.relation,
         phone: nomineeForm.phone.trim(),
-      },
-    });
-    setMembers(updated);
-    setSaving(false);
-    closeAddForm();
+      });
+      await refreshMembers();
+      closeAddForm();
+    } catch (err) {
+      setNomineeErrors({ form: err.message });
+    } finally {
+      setSaving(false);
+    }
   }
 
   function handleExportPdf() {
@@ -173,13 +180,14 @@ export default function InsuranceMembers() {
     doc.save(`KGSC-Insured-Members-${dateStamp}.pdf`);
   }
 
-  function handleRemove(member) {
+  async function handleRemove(member) {
     if (!window.confirm(`Remove insurance for ${member.name}?`)) return;
-    const updated = updateMemberRecord(member.id, {
-      insurance: false,
-      nominee: null,
-    });
-    setMembers(updated);
+    try {
+      await api.del(`/api/manager/members/${member._id}/insurance`);
+      await refreshMembers();
+    } catch (err) {
+      console.error("Failed to remove insurance:", err.message);
+    }
   }
 
   return (
@@ -211,7 +219,7 @@ export default function InsuranceMembers() {
           <i className="bi bi-search"></i>
           <input
             type="text"
-            placeholder="Search a member by name, phone, or ID"
+            placeholder="Search a member by name or phone"
             value={addQuery}
             onChange={(e) => setAddQuery(e.target.value)}
           />
@@ -226,7 +234,7 @@ export default function InsuranceMembers() {
             ) : (
               addResults.map((m) => (
                 <button
-                  key={m.id}
+                  key={m._id}
                   type="button"
                   className="ins-result-row"
                   onClick={() => openAddForm(m)}
@@ -279,10 +287,9 @@ export default function InsuranceMembers() {
               </thead>
               <tbody>
                 {insuredMembers.map((m) => (
-                  <tr key={m.id}>
+                  <tr key={m._id}>
                     <td>
                       <div className="member-name">{m.name}</div>
-                      <div className="member-id">{m.id}</div>
                     </td>
                     <td>{m.phone}</td>
                     <td>{m.nominee?.name || "—"}</td>
@@ -329,7 +336,7 @@ export default function InsuranceMembers() {
             <>
               <h2 className="mgr-modal-title">Add nominee</h2>
               <p className="mgr-modal-sub">
-                Insuring {addTarget.name} · {addTarget.id}
+                Insuring {addTarget.name} · {addTarget.phone}
               </p>
 
               <form
@@ -387,6 +394,8 @@ export default function InsuranceMembers() {
                     <span className="field-error">{nomineeErrors.phone}</span>
                   </div>
                 </div>
+
+                <span className="field-error">{nomineeErrors.form}</span>
 
                 <div className="mgr-modal-actions">
                   <button

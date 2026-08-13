@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { loadMembers } from "../data/membersStore.js";
+import { api } from "../lib/api.js";
 import Chart from "chart.js/auto";
 import "./Manager.css";
 
@@ -17,31 +17,25 @@ function formatDate(iso) {
 }
 
 export default function Dashboard() {
-  const [members, setMembers] = useState([]);
+  const [stats, setStats] = useState({
+    totalMembers: 0,
+    newThisMonth: 0,
+    existingMembers: 0,
+    recentMembers: [],
+  });
   const chartRef = useRef(null);
   const chartInstance = useRef(null);
 
   useEffect(() => {
-    setMembers(loadMembers());
+    api
+      .get("/api/manager/dashboard")
+      .then((res) => setStats(res.data))
+      .catch((err) => console.error("Failed to load dashboard:", err.message));
   }, []);
-
-  const now = new Date();
-  const newThisMonth = members.filter((m) => {
-    const d = new Date(m.joined);
-    return (
-      d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
-    );
-  }).length;
-
-  const existingMembers = members.length - newThisMonth;
-
-  const recent = [...members]
-    .sort((a, b) => new Date(b.joined) - new Date(a.joined))
-    .slice(0, 5);
 
   // ---- Pie chart: New vs Existing members ----
   useEffect(() => {
-    if (!chartRef.current || members.length === 0) return;
+    if (!chartRef.current || stats.totalMembers === 0) return;
 
     if (chartInstance.current) {
       chartInstance.current.destroy();
@@ -53,7 +47,7 @@ export default function Dashboard() {
         labels: ["New this month", "Existing members"],
         datasets: [
           {
-            data: [newThisMonth, existingMembers],
+            data: [stats.newThisMonth, stats.existingMembers],
             backgroundColor: ["#e08a1e", "#2d4a2f"], // marigold + forest, matches KGSC theme
             borderColor: "#fdfaf3", // cream
             borderWidth: 2,
@@ -77,7 +71,7 @@ export default function Dashboard() {
           tooltip: {
             callbacks: {
               label: (ctx) => {
-                const total = newThisMonth + existingMembers;
+                const total = stats.newThisMonth + stats.existingMembers;
                 const pct = total ? Math.round((ctx.raw / total) * 100) : 0;
                 return ` ${ctx.label}: ${ctx.raw} (${pct}%)`;
               },
@@ -90,7 +84,7 @@ export default function Dashboard() {
     return () => {
       if (chartInstance.current) chartInstance.current.destroy();
     };
-  }, [members.length, newThisMonth, existingMembers]);
+  }, [stats]);
 
   return (
     <>
@@ -105,14 +99,14 @@ export default function Dashboard() {
           <div className="stat-icon">
             <i className="bi bi-people-fill"></i>
           </div>
-          <div className="stat-num">{members.length}</div>
+          <div className="stat-num">{stats.totalMembers}</div>
           <div className="stat-label">Total members</div>
         </div>
         <div className="stat-card">
           <div className="stat-icon">
             <i className="bi bi-person-plus-fill"></i>
           </div>
-          <div className="stat-num">{newThisMonth}</div>
+          <div className="stat-num">{stats.newThisMonth}</div>
           <div className="stat-label">New this month</div>
         </div>
         <div className="stat-card">
@@ -137,7 +131,7 @@ export default function Dashboard() {
           <h2 className="dash-panel-title">
             <i className="bi bi-pie-chart-fill"></i> New vs Existing Members
           </h2>
-          {members.length === 0 ? (
+          {stats.totalMembers === 0 ? (
             <p className="member-empty">Add members to see this breakdown.</p>
           ) : (
             <div className="dash-chart-wrap dash-chart-wrap-pie">
@@ -152,16 +146,22 @@ export default function Dashboard() {
           </h2>
           <div className="recent-list">
             <div className="recent-row">
-              <span className="recent-name">New members this month</span>
-              <span className="member-id">{newThisMonth}</span>
+              <span className="recent-name">New members this month </span>
+              <span className="member-id">
+                <b>{stats.newThisMonth}</b>
+              </span>
             </div>
             <div className="recent-row">
               <span className="recent-name">Existing members</span>
-              <span className="member-id">{existingMembers}</span>
+              <span className="member-id">
+                <b>{stats.existingMembers}</b>
+              </span>
             </div>
             <div className="recent-row">
               <span className="recent-name">Total Members</span>
-              <span className="member-id">{members.length}</span>
+              <span className="member-id">
+                <b>{stats.totalMembers}</b>
+              </span>
             </div>
           </div>
         </div>
@@ -175,7 +175,7 @@ export default function Dashboard() {
           </Link>
         </div>
 
-        {recent.length === 0 ? (
+        {stats.recentMembers.length === 0 ? (
           <p className="member-empty">No members yet — add your first one.</p>
         ) : (
           <div className="member-table-wrap">
@@ -188,11 +188,10 @@ export default function Dashboard() {
                 </tr>
               </thead>
               <tbody>
-                {recent.map((m) => (
-                  <tr key={m.id}>
+                {stats.recentMembers.map((m) => (
+                  <tr key={m._id}>
                     <td>
                       <div className="member-name">{m.name}</div>
-                      <div className="member-id">{m.id}</div>
                     </td>
                     <td>{m.phone}</td>
                     <td>{formatDate(m.joined)}</td>

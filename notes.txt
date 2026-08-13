@@ -8,11 +8,6 @@
 
 -AdminPage : 
         -correct Quick Breakdown text font style.
-        -sidebar :
-            add settings button to handle small chnages from backend.
-            add manager page button to directly drive without login
-            add chat button to write text that will show on user's dashboard messages section.
-
 -profile : 
         -change routes /dashboard , /profile to /dashboard/profile.
         -make profile upload button workable.
@@ -21,3 +16,6 @@
 - create default email and password for Admin & Manager.
 
 connect whole project with backend. 
+
+
+kgsc_admin 

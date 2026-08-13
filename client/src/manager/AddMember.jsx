@@ -1,11 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Toast from "../components/Toast.jsx";
-import {
-  addMemberRecord,
-  loadMembers,
-  nextMemberId,
-} from "../data/membersStore.js";
+import { api } from "../lib/api.js";
 import "./Manager.css";
 
 const SIZES = ["S", "M", "L", "XL", "XXL", "3XL"];
@@ -45,29 +41,29 @@ export default function AddMember() {
     return Object.keys(next).length === 0;
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     if (!validate()) return;
 
     setSaving(true);
-    const members = loadMembers();
-    const record = {
-      id: nextMemberId(members),
-      name: form.name.trim(),
-      phone: form.phone.trim(),
-      aadhar: form.aadhar.trim(),
-      address: form.address.trim(),
-      tshirtSize: form.tshirtSize,
-      shortsSize: form.shortsSize,
-      // Recorded automatically at the moment the member is added.
-      joined: new Date().toISOString().slice(0, 10),
-    };
-    addMemberRecord(record);
-    setSaving(false);
-    setToastOpen(true);
-    setForm(emptyForm);
+    try {
+      await api.post("/api/manager/members", {
+        name: form.name.trim(),
+        phone: form.phone.trim(),
+        aadhar: form.aadhar.trim(),
+        address: form.address.trim(),
+        tshirtSize: form.tshirtSize,
+        shortsSize: form.shortsSize,
+      });
 
-    window.setTimeout(() => navigate("/manager/members"), 900);
+      setToastOpen(true);
+      setForm(emptyForm);
+      window.setTimeout(() => navigate("/manager/members"), 900);
+    } catch (err) {
+      setErrors((prev) => ({ ...prev, form: err.message }));
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -178,6 +174,8 @@ export default function AddMember() {
               <span className="field-error">{errors.shortsSize}</span>
             </div>
           </div>
+
+          <span className="field-error">{errors.form}</span>
 
           <div>
             <button type="submit" className="btn btn-primary" disabled={saving}>

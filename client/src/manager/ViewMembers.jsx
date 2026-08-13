@@ -1,10 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  deleteMemberRecord,
-  loadMembers,
-  updateMemberRecord,
-} from "../data/membersStore.js";
+import { api } from "../lib/api.js";
 import "./Manager.css";
 
 const SIZES = ["S", "M", "L", "XL", "XXL", "3XL"];
@@ -22,11 +18,6 @@ function formatDate(iso) {
   }
 }
 
-function maskAadhar(aadhar) {
-  if (!aadhar) return "—";
-  return `XXXX XXXX ${aadhar.slice(-4)}`;
-}
-
 export default function ViewMembers() {
   const [members, setMembers] = useState([]);
   const [query, setQuery] = useState("");
@@ -37,8 +28,15 @@ export default function ViewMembers() {
   const [saving, setSaving] = useState(false);
   const [page, setPage] = useState(1);
 
+  function refreshMembers() {
+    return api
+      .get("/api/manager/members")
+      .then((res) => setMembers(res.data))
+      .catch((err) => console.error("Failed to load members:", err.message));
+  }
+
   useEffect(() => {
-    setMembers(loadMembers());
+    refreshMembers();
   }, []);
 
   useEffect(() => {
@@ -56,7 +54,6 @@ export default function ViewMembers() {
       (m) =>
         m.name.toLowerCase().includes(q) ||
         m.phone.includes(q) ||
-        m.id.toLowerCase().includes(q) ||
         m.address.toLowerCase().includes(q),
     );
   }, [members, query]);
@@ -76,9 +73,14 @@ export default function ViewMembers() {
     return filtered.slice(start, start + PAGE_SIZE);
   }, [filtered, page]);
 
-  function handleDelete(id) {
+  async function handleDelete(id) {
     if (!window.confirm("Remove this member from the club roster?")) return;
-    setMembers(deleteMemberRecord(id));
+    try {
+      await api.del(`/api/manager/members/${id}`);
+      await refreshMembers();
+    } catch (err) {
+      console.error("Failed to delete member:", err.message);
+    }
   }
 
   function openView(member) {
@@ -124,22 +126,27 @@ export default function ViewMembers() {
     return Object.keys(next).length === 0;
   }
 
-  function handleEditSubmit(e) {
+  async function handleEditSubmit(e) {
     e.preventDefault();
     if (!validateEdit()) return;
 
     setSaving(true);
-    const updated = updateMemberRecord(editingMember.id, {
-      name: editForm.name.trim(),
-      phone: editForm.phone.trim(),
-      aadhar: editForm.aadhar.trim(),
-      address: editForm.address.trim(),
-      tshirtSize: editForm.tshirtSize,
-      shortsSize: editForm.shortsSize,
-    });
-    setMembers(updated);
-    setSaving(false);
-    closeModals();
+    try {
+      await api.put(`/api/manager/members/${editingMember._id}`, {
+        name: editForm.name.trim(),
+        phone: editForm.phone.trim(),
+        aadhar: editForm.aadhar.trim(),
+        address: editForm.address.trim(),
+        tshirtSize: editForm.tshirtSize,
+        shortsSize: editForm.shortsSize,
+      });
+      await refreshMembers();
+      closeModals();
+    } catch (err) {
+      setEditErrors((prev) => ({ ...prev, form: err.message }));
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -161,7 +168,7 @@ export default function ViewMembers() {
             <i className="bi bi-search"></i>
             <input
               type="text"
-              placeholder="Search by name, phone, or ID"
+              placeholder="Search by name, phone, or address"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
@@ -188,10 +195,9 @@ export default function ViewMembers() {
                 </thead>
                 <tbody>
                   {paginated.map((m) => (
-                    <tr key={m.id}>
+                    <tr key={m._id}>
                       <td>
                         <div className="member-name">{m.name}</div>
-                        <div className="member-id">{m.id}</div>
                       </td>
                       <td>{m.phone}</td>
                       <td className="insurance-cell">
@@ -229,7 +235,7 @@ export default function ViewMembers() {
                           </button>
                           <button
                             className="icon-btn icon-btn-danger"
-                            onClick={() => handleDelete(m.id)}
+                            onClick={() => handleDelete(m._id)}
                             aria-label={`Remove ${m.name}`}
                             title="Remove member"
                           >
@@ -291,7 +297,7 @@ export default function ViewMembers() {
           {viewingMember && (
             <>
               <h2 className="mgr-modal-title">{viewingMember.name}</h2>
-              <p className="mgr-modal-sub">{viewingMember.id}</p>
+              <p className="mgr-modal-sub">{viewingMember.phone}</p>
 
               <div className="detail-grid">
                 <div className="detail-item">
@@ -375,7 +381,7 @@ export default function ViewMembers() {
           {editingMember && editForm && (
             <>
               <h2 className="mgr-modal-title">Edit member</h2>
-              <p className="mgr-modal-sub">{editingMember.id}</p>
+              <p className="mgr-modal-sub">{editingMember.phone}</p>
 
               <form
                 className="manager-form"
@@ -483,6 +489,8 @@ export default function ViewMembers() {
                     <span className="field-error">{editErrors.shortsSize}</span>
                   </div>
                 </div>
+
+                <span className="field-error">{editErrors.form}</span>
 
                 <div className="mgr-modal-actions">
                   <button

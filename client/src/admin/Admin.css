@@ -776,7 +776,12 @@
 }
 
 .recent-row {
+  background: var(--cream-100);
   border-bottom: 1px solid var(--line);
   border-radius: none;
-  padding: 14px 0;
+  padding: 14px;
+}
+
+.recent-list{
+  font-family: var(--font-display) !important;
 }

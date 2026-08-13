@@ -5,6 +5,9 @@ import Contact from "./pages/Contact.jsx";
 import Location from "./pages/Location.jsx";
 import Login from "./pages/Login.jsx";
 import Author from "./pages/Author.jsx";
+import Profile from "./pages/Profile";
+import UserDashboard from "./pages/UserDashboard.jsx";
+import CompleteProfile from "./pages/CompleteProfile";
 
 // Manager Routes
 import ManagerLayout from "./manager/ManagerLayout.jsx";
@@ -17,10 +20,8 @@ import AdminLayout from "./admin/AdminLayout.jsx";
 import AdminDashboard from "./admin/Dashboard.jsx";
 import Reports from "./admin/Reports.jsx";
 import AddTransaction from "./admin/AddTransaction.jsx";
-import UserDashboard from "./pages/UserDashboard.jsx";
-import CompleteProfile from "./pages/CompleteProfile";
-import Profile from "./pages/Profile";
-// ...
+import AdminMessages from "./admin/AdminMessages.jsx";
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -34,18 +35,19 @@ export default function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/author" element={<Author />} />
         <Route path="/dashboard" element={<UserDashboard />} />
-
+        // Manager Routes
         <Route path="/manager" element={<ManagerLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="members" element={<ViewMembers />} />
           <Route path="add-member" element={<AddMember />} />
           <Route path="insurance" element={<InsuranceMembers />} />
         </Route>
-
+        // Admin Routes
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
           <Route path="reports" element={<Reports />} />
           <Route path="add-transaction" element={<AddTransaction />} />
+          <Route path="/admin/messages" element={<AdminMessages />} />
         </Route>
       </Routes>
     </BrowserRouter>

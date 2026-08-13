@@ -6,6 +6,8 @@ const navItems = [
   { to: "/admin", label: "Dashboard", icon: "bi-grid-1x2-fill", end: true },
   { to: "/admin/reports", label: "Reports", icon: "bi-bar-chart-fill" },
   { to: "/admin/add-transaction", label: "Add Transaction", icon: "bi-cash-coin" },
+  { to: "/admin/messages", label: "Chat", icon: "bi-messenger" },
+  { to: "/manager", label: "Manager portal", icon: "bi-briefcase-fill" },
 ];
 
 export default function AdminLayout() {

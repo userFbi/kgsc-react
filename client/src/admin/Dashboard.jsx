@@ -182,15 +182,15 @@ export default function Dashboard() {
           <div className="recent-list">
             <div className="recent-row">
               <span className="recent-name">This month's income</span>
-              <span className="txn-id">{formatINR(totals.monthIncome)}</span>
+              <span className="txn-id"><b>{formatINR(totals.monthIncome)}</b></span>
             </div>
             <div className="recent-row">
               <span className="recent-name">This month's expense</span>
-              <span className="txn-id">{formatINR(totals.monthExpense)}</span>
+              <span className="txn-id"><b>{formatINR(totals.monthExpense)}</b></span>
             </div>
             <div className="recent-row">
               <span className="recent-name">Net balance</span>
-              <span className="txn-id">{formatINR(totals.balance)}</span>
+              <span className="txn-id"><b>{formatINR(totals.balance)}</b></span>
             </div>
           </div>
         </div>
