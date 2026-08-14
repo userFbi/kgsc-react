@@ -434,6 +434,7 @@ section {
 
 /* ============================= GALLERY ============================= */
 .gallery-scroller {
+  margin-left: 3px !important;
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: 78%;
@@ -465,6 +466,7 @@ section {
     padding: 0;
   }
 }
+
 
 .gallery-card {
   scroll-snap-align: start;

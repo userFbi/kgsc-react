@@ -19,11 +19,12 @@ export default function Author() {
           <div className="author-avatar">TP</div>
           <div>
             <div className="author-name">Tushar Pawar</div>
-            <div className="author-role">FRONTEND DEVELOPER &amp; UI DESIGNER</div>
+            <div className="author-role">ADMIN & COMMUNITY MEMBER</div>
             <p className="author-bio">
-              Hi! I'm Tushar, a frontend developer with a love for clean UI
-              and seamless user experiences. I build modern, responsive
-              websites with HTML, CSS and JavaScript.
+              Hi! I'm Tushar. I’m someone who enjoys being part of the
+              community, meeting new people, and taking part in group activities
+              and events. I believe in staying connected, helping others, and
+              making good memories together.
             </p>
             <div className="author-socials">
               <a
@@ -54,7 +55,6 @@ export default function Author() {
           </div>
         </div>
       </main>
-
       <Footer />
     </div>
   );
