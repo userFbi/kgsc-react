@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./UserDashboard.css";
-import { loadMessages } from "../data/messagesStore.js";
+import { api } from "../lib/api.js";
 
 const API_URL = "http://localhost:5050/api/auth";
 
@@ -13,7 +13,10 @@ export default function UserDashboard() {
   const [messages, setMessages] = useState([]);
 
   useEffect(() => {
-    setMessages(loadMessages());
+    api
+      .get("/api/messages")
+      .then((res) => setMessages(res.data))
+      .catch((err) => console.error("Failed to load messages:", err.message));
   }, []);
 
   useEffect(() => {
@@ -152,7 +155,7 @@ export default function UserDashboard() {
                     <div className="ud-notice-head">
                       <p className="ud-notice-title">{m.title}</p>
                       <span className="ud-notice-date">
-                        {formatDate(m.date)}
+                        {formatDate(m.createdAt)}
                       </span>
                     </div>
                     <p className="ud-notice-body">{m.message}</p>

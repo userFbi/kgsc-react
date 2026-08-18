@@ -2,7 +2,6 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
-
 // GET /api/auth/me
 exports.getMe = async (req, res) => {
   try {
@@ -74,7 +73,9 @@ exports.login = async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ error: "Email and password are required." });
+      return res
+        .status(400)
+        .json({ error: "Email and password are required." });
     }
 
     const user = await User.findOne({ email: email.toLowerCase() });
@@ -101,6 +102,35 @@ exports.googleLogin = async (req, res) => {
   return res.status(501).json({ error: "Google login not set up yet." });
 };
 
+// PATCH /api/auth/profile
+exports.updateProfile = async (req, res) => {
+  try {
+    const { fullName, phone, address, aadharNumber } = req.body;
+
+    const updateData = {};
+    if (fullName) updateData.fullName = fullName;
+    if (phone) updateData.phone = phone;
+    if (address) updateData.address = address;
+    if (aadharNumber) updateData.aadharNumber = aadharNumber;
+    if (req.file) updateData.profilePhotoUrl = req.file.path;
+
+    const user = await User.findById(req.userId);
+    const hasAadhar = aadharNumber || user.aadharNumber;
+    const hasAddress = address || user.address;
+    if (hasAadhar && hasAddress) {
+      updateData.isProfileComplete = true;
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(req.userId, updateData, {
+      new: true,
+    });
+
+    res.status(200).json({ user: sanitizeUser(updatedUser) });
+  } catch (error) {
+    console.error("Update profile error:", error);
+    res.status(500).json({ error: "Something went wrong. Try again." });
+  }
+};
 
 // PATCH /api/auth/complete-profile
 exports.completeProfile = async (req, res) => {

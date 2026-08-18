@@ -1,17 +1,21 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Toast from "../components/Toast.jsx";
-import {
-  CATEGORIES,
-  addTransactionRecord,
-  loadTransactions,
-  nextTransactionId,
-} from "../data/transactionsStore.js";
+import { api } from "../lib/api.js";
 import "./Admin.css";
 
 function todayISO() {
   return new Date().toISOString().slice(0, 10);
 }
+
+const CATEGORIES = [
+  "Matki",
+  "Lezim",
+  "Food ",
+  "Medical",
+  "Equipments",
+  "Other",
+];
 
 const emptyForm = {
   type: "income",
@@ -42,41 +46,46 @@ export default function AddTransaction() {
     return Object.keys(next).length === 0;
   }
 
-  function saveTransaction() {
-    const transactions = loadTransactions();
-    const record = {
-      id: nextTransactionId(transactions),
+  async function saveTransaction() {
+    await api.post("/api/transactions", {
       type: form.type,
       amount: Number(form.amount),
       date: form.date,
       category: form.category,
       description: form.description.trim(),
-      createdAt: new Date().toISOString(),
-    };
-    addTransactionRecord(record);
-    return record;
+    });
   }
 
-  function handleSave(e) {
+  async function handleSave(e) {
     e.preventDefault();
     if (!validate()) return;
 
     setSaving(true);
-    saveTransaction();
-    setSaving(false);
-    setToastOpen(true);
-    window.setTimeout(() => navigate("/admin/reports"), 900);
+    try {
+      await saveTransaction();
+      setToastOpen(true);
+      window.setTimeout(() => navigate("/admin/reports"), 900);
+    } catch (err) {
+      setErrors({ amount: err.message });
+    } finally {
+      setSaving(false);
+    }
   }
 
-  function handleSaveAndAddAnother(e) {
+  async function handleSaveAndAddAnother(e) {
     e.preventDefault();
     if (!validate()) return;
 
     setSaving(true);
-    saveTransaction();
-    setSaving(false);
-    setToastOpen(true);
-    setForm({ ...emptyForm, type: form.type, date: todayISO() });
+    try {
+      await saveTransaction();
+      setToastOpen(true);
+      setForm({ ...emptyForm, type: form.type, date: todayISO() });
+    } catch (err) {
+      setErrors({ amount: err.message });
+    } finally {
+      setSaving(false);
+    }
   }
 
   function handleCancel() {
@@ -88,12 +97,18 @@ export default function AddTransaction() {
       <div className="admin-page-head">
         <span className="eyebrow">Finance</span>
         <h1>Add transaction</h1>
-        <p>Record club income or expenses. New entries appear in Reports right away.</p>
+        <p>
+          Record club income or expenses. New entries appear in Reports right
+          away.
+        </p>
       </div>
 
       <div className="admin-panel">
-        {/* Income / Expense toggle sits outside the form fields */}
-        <div className="type-toggle" role="radiogroup" aria-label="Transaction type">
+        <div
+          className="type-toggle"
+          role="radiogroup"
+          aria-label="Transaction type"
+        >
           <button
             type="button"
             role="radio"
@@ -129,7 +144,9 @@ export default function AddTransaction() {
                 onChange={(e) => updateField("amount", e.target.value)}
                 required
               />
-              <span className="field-hint">Enter the transaction amount in INR</span>
+              <span className="field-hint">
+                Enter the transaction amount in INR
+              </span>
               <span className="field-error">{errors.amount}</span>
             </div>
 
@@ -195,7 +212,11 @@ export default function AddTransaction() {
             >
               Save &amp; Add Another
             </button>
-            <button type="button" className="btn btn-text" onClick={handleCancel}>
+            <button
+              type="button"
+              className="btn btn-text"
+              onClick={handleCancel}
+            >
               Cancel
             </button>
           </div>

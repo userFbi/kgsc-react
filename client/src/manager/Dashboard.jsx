@@ -16,11 +16,24 @@ function formatDate(iso) {
   }
 }
 
+function getYearsRunning() {
+  const founded = new Date(1988, 2, 16); // month is 0-indexed, so 2 = March
+  const now = new Date();
+  let years = now.getFullYear() - founded.getFullYear();
+  const hasHadAnniversaryThisYear =
+    now.getMonth() > founded.getMonth() ||
+    (now.getMonth() === founded.getMonth() &&
+      now.getDate() >= founded.getDate());
+  if (!hasHadAnniversaryThisYear) years--;
+  return years;
+}
+
 export default function Dashboard() {
   const [stats, setStats] = useState({
     totalMembers: 0,
     newThisMonth: 0,
     existingMembers: 0,
+    insuredCount: 0,
     recentMembers: [],
   });
   const chartRef = useRef(null);
@@ -111,16 +124,16 @@ export default function Dashboard() {
         </div>
         <div className="stat-card">
           <div className="stat-icon">
-            <i className="bi bi-award-fill"></i>
+            <i className="bi bi-shield-check"></i>
           </div>
-          <div className="stat-num">350+</div>
-          <div className="stat-label">Club-wide members</div>
+          <div className="stat-num">{stats.insuredCount}</div>
+          <div className="stat-label">Insured members</div>
         </div>
         <div className="stat-card">
           <div className="stat-icon">
             <i className="bi bi-calendar-event-fill"></i>
           </div>
-          <div className="stat-num">37+</div>
+          <div className="stat-num">{getYearsRunning()}+</div>
           <div className="stat-label">Years running</div>
         </div>
       </div>

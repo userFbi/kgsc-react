@@ -1,21 +1,43 @@
 - HomePage : 
-        -make Members changeable from backend.
         -Repace Moments from the club with actual images or make slider of images.
         -join with us : make login fully workable(goggle login also).
 
 -ManagerPage : 
-        -correct Quick Breakdown text font style.         
+        -make like it look like page on screen (desktop & mobile for both).
 
 -AdminPage : 
-        -correct Quick Breakdown text font style.
+        -make like it look like page on screen (desktop & mobile for both).
 -profile : 
         -change routes /dashboard , /profile to /dashboard/profile.
         -make profile upload button workable.
-            
 
 - create default email and password for Admin & Manager.
 
 connect whole project with backend. 
 
 
-kgsc_admin 
+///////////////////////////////////////////////////////
+Fix option:
+
+Agar aap chahte ho ki apne personal account (pawartushar2024.katargam@gmail.com) se hi admin panel use karo (jo zyada practical hai), to MongoDB Atlas me:
+
+users collection kholo
+Apna account dhoondo (pawartushar2024.katargam@gmail.com)
+role field ko "member" se "admin" kar do (manually edit karke)
+status ko bhi "approved" kar do
+
+Fir logout karke dubara login karo (naya token milega updated role ke saath), phir Admin Messages se naya message bhejo — ab "Tushar Pawar (admin)" dikhega.
+
+Purana "Admin User" wala message delete kar sakte ho AdminMessages panel se (🗑️ icon).
+
+///////////////////////////////////////////////////////
+
+-mongo user & password kgsc_admin 
+
+-Admin:
+Email: admin@kgsc.com
+Password: Admin@123
+
+-Manager:
+Email: manager@kgsc.com
+Password: Manager@123

@@ -4,9 +4,17 @@ import "./ManagerLayout.css";
 
 const navItems = [
   { to: "/manager", label: "Dashboard", icon: "bi-grid-1x2-fill", end: true },
-  { to: "/manager/insurance", label : "Insurance List", icon : "bi-shield-shaded"},
+  {
+    to: "/manager/insurance",
+    label: "Insurance List",
+    icon: "bi-shield-shaded",
+  },
   { to: "/manager/members", label: "View Members", icon: "bi-people-fill" },
-  { to: "/manager/add-member", label: "Add Member", icon: "bi-person-plus-fill" },
+  {
+    to: "/manager/add-member",
+    label: "Add Member",
+    icon: "bi-person-plus-fill",
+  },
 ];
 
 export default function ManagerLayout() {
@@ -14,8 +22,9 @@ export default function ManagerLayout() {
   const navigate = useNavigate();
 
   function handleLogout() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     setSidebarOpen(false);
-    // TODO: clear real auth/session state once a backend is wired up.
     navigate("/login");
   }
 
@@ -57,7 +66,10 @@ export default function ManagerLayout() {
           ))}
         </nav>
 
-        <button className="manager-nav-item manager-logout" onClick={handleLogout}>
+        <button
+          className="manager-nav-item manager-logout"
+          onClick={handleLogout}
+        >
           <i className="bi bi-box-arrow-right"></i>
           <span>Logout</span>
         </button>

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { loadTransactions } from "../data/transactionsStore.js";
+import { api } from "../lib/api.js";
 import Chart from "chart.js/auto";
 import "./Admin.css";
 
@@ -26,7 +26,12 @@ export default function Dashboard() {
   const chartInstance = useRef(null);
 
   useEffect(() => {
-    setTransactions(loadTransactions());
+    api
+      .get("/api/transactions")
+      .then((res) => setTransactions(res.data))
+      .catch((err) =>
+        console.error("Failed to load transactions:", err.message),
+      );
   }, []);
 
   const now = new Date();
@@ -70,7 +75,6 @@ export default function Dashboard() {
     [transactions],
   );
 
-  // ---- Pie chart: Income vs Expense ----
   useEffect(() => {
     if (!chartRef.current || transactions.length === 0) return;
 
@@ -85,7 +89,7 @@ export default function Dashboard() {
         datasets: [
           {
             data: [totals.income, totals.expense],
-            backgroundColor: ["#1f7a3a", "#a5341f"], // blue, orange
+            backgroundColor: ["#1f7a3a", "#a5341f"],
             borderRadius: 8,
             barThickness: 60,
           },
@@ -121,6 +125,7 @@ export default function Dashboard() {
       if (chartInstance.current) chartInstance.current.destroy();
     };
   }, [transactions.length, totals.income, totals.expense]);
+
   return (
     <>
       <div className="admin-page-head">
@@ -160,7 +165,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* ============ INCOME VS EXPENSE PIE CHART ============ */}
       <div className="dash-grid">
         <div className="dash-panel dash-chart-panel">
           <h2 className="dash-panel-title">
@@ -182,15 +186,21 @@ export default function Dashboard() {
           <div className="recent-list">
             <div className="recent-row">
               <span className="recent-name">This month's income</span>
-              <span className="txn-id"><b>{formatINR(totals.monthIncome)}</b></span>
+              <span className="txn-id">
+                <b>{formatINR(totals.monthIncome)}</b>
+              </span>
             </div>
             <div className="recent-row">
               <span className="recent-name">This month's expense</span>
-              <span className="txn-id"><b>{formatINR(totals.monthExpense)}</b></span>
+              <span className="txn-id">
+                <b>{formatINR(totals.monthExpense)}</b>
+              </span>
             </div>
             <div className="recent-row">
               <span className="recent-name">Net balance</span>
-              <span className="txn-id"><b>{formatINR(totals.balance)}</b></span>
+              <span className="txn-id">
+                <b>{formatINR(totals.balance)}</b>
+              </span>
             </div>
           </div>
         </div>
@@ -219,7 +229,7 @@ export default function Dashboard() {
               </thead>
               <tbody>
                 {recent.map((t) => (
-                  <tr key={t.id}>
+                  <tr key={t._id}>
                     <td>
                       <span className={`type-badge is-${t.type}`}>
                         <i
@@ -228,7 +238,7 @@ export default function Dashboard() {
                         {t.type === "income" ? "Income" : "Expense"}
                       </span>
                       <div className="txn-id" style={{ marginTop: 6 }}>
-                        {t.id}
+                        {t._id}
                       </div>
                     </td>
                     <td>{t.category}</td>

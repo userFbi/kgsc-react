@@ -26,7 +26,7 @@ export default function Footer() {
               <Link to="/location">Location</Link>
             </li>
             <li>
-              <Link to="/#contact">Join us</Link>
+              <Link to="/login">Join us</Link>
             </li>
           </ul>
         </div>

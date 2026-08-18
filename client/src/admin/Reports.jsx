@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { deleteTransactionRecord, loadTransactions } from "../data/transactionsStore.js";
+import { api } from "../lib/api.js";
 import "./Admin.css";
 
 function formatDate(iso) {
@@ -24,11 +24,20 @@ const PAGE_SIZE = 8;
 export default function Reports() {
   const [transactions, setTransactions] = useState([]);
   const [query, setQuery] = useState("");
-  const [filter, setFilter] = useState("all"); // all | income | expense
+  const [filter, setFilter] = useState("all");
   const [page, setPage] = useState(1);
 
+  function refreshTransactions() {
+    return api
+      .get("/api/transactions")
+      .then((res) => setTransactions(res.data))
+      .catch((err) =>
+        console.error("Failed to load transactions:", err.message),
+      );
+  }
+
   useEffect(() => {
-    setTransactions(loadTransactions());
+    refreshTransactions();
   }, []);
 
   const totals = useMemo(() => {
@@ -49,8 +58,8 @@ export default function Reports() {
       list = list.filter(
         (t) =>
           t.category.toLowerCase().includes(q) ||
-          t.description.toLowerCase().includes(q) ||
-          t.id.toLowerCase().includes(q),
+          (t.description || "").toLowerCase().includes(q) ||
+          t._id.toLowerCase().includes(q),
       );
     }
     return [...list].sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -71,9 +80,14 @@ export default function Reports() {
     return filtered.slice(start, start + PAGE_SIZE);
   }, [filtered, page]);
 
-  function handleDelete(id) {
+  async function handleDelete(id) {
     if (!window.confirm("Delete this transaction?")) return;
-    setTransactions(deleteTransactionRecord(id));
+    try {
+      await api.del(`/api/transactions/${id}`);
+      await refreshTransactions();
+    } catch (err) {
+      console.error("Failed to delete transaction:", err.message);
+    }
   }
 
   return (
@@ -154,7 +168,7 @@ export default function Reports() {
               </thead>
               <tbody>
                 {paged.map((t) => (
-                  <tr key={t.id}>
+                  <tr key={t._id}>
                     <td>
                       <span className={`type-badge is-${t.type}`}>
                         <i
@@ -163,10 +177,16 @@ export default function Reports() {
                         {t.type === "income" ? "Income" : "Expense"}
                       </span>
                       <div className="txn-id" style={{ marginTop: 6 }}>
-                        {t.id}
+                        {t._id}
                       </div>
                       {t.description && (
-                        <div style={{ marginTop: 4, fontSize: "0.86rem", color: "rgba(17,18,13,0.6)" }}>
+                        <div
+                          style={{
+                            marginTop: 4,
+                            fontSize: "0.86rem",
+                            color: "rgba(17,18,13,0.6)",
+                          }}
+                        >
                           {t.description}
                         </div>
                       )}
@@ -181,8 +201,8 @@ export default function Reports() {
                       <div className="action-buttons">
                         <button
                           className="icon-btn icon-btn-danger"
-                          onClick={() => handleDelete(t.id)}
-                          aria-label={`Delete transaction ${t.id}`}
+                          onClick={() => handleDelete(t._id)}
+                          aria-label={`Delete transaction ${t._id}`}
                           title="Delete transaction"
                         >
                           <i className="bi bi-trash3-fill"></i>
