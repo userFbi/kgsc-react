@@ -1,3 +1,4 @@
+const User = require("../models/User");
 const Member = require("../models/Member");
 
 // POST /api/manager/members
@@ -113,16 +114,30 @@ exports.removeInsurance = async (req, res) => {
   }
 };
 
-// PUT /api/manager/members/:id  (edit — ViewMembers.jsx ke liye)
+// PUT /api/manager/members/:id  (edit)
 exports.updateMember = async (req, res) => {
   try {
     const { name, phone, aadhar, address, tshirtSize, shortsSize } = req.body;
     const member = await Member.findByIdAndUpdate(
       req.params.id,
       { name, phone, aadhar, address, tshirtSize, shortsSize },
-      { new: true },
+      { new: true }
     );
     if (!member) return res.status(404).json({ error: "Member not found." });
+
+    // 👇 Agar ye member kisi User account se linked hai, User bhi sync karo
+    if (member.userId) {
+      const isProfileComplete = Boolean(aadhar && address);
+      await User.findByIdAndUpdate(member.userId, {
+        fullName: name,
+        aadharNumber: aadhar,
+        address,
+        tshirtSize,
+        shortsSize,
+        isProfileComplete,
+      });
+    }
+
     res.status(200).json({ data: member });
   } catch (error) {
     console.error("Update member error:", error);

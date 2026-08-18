@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema(
             },
         },
         googleId: { type: String, default: null },
-        aadharNumber: { type: String, default: null,  },
+        aadharNumber: { type: String, default: null, },
         role: {
             type: String,
             enum: ["member", "manager", "admin"],
@@ -39,6 +39,16 @@ const userSchema = new mongoose.Schema(
         },
         address: {
             type: String,
+            default: null,
+        },
+        tshirtSize: {
+            type: String,
+            enum: ["S", "M", "L", "XL", "XXL", "3XL", "4XL", "5XL"],
+            default: null,
+        },
+        shortsSize: {
+            type: String,
+            enum: ["S", "M", "L", "XL", "XXL", "3XL", "4XL", "5XL"],
             default: null,
         },
     },

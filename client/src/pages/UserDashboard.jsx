@@ -76,19 +76,15 @@ export default function UserDashboard() {
   return (
     <div className="ud-page">
       <div className="ud-wrap">
-        <div className="ud-topbar">
+        <div className="ud-idcard">
           <button
             className="ud-menu-btn"
             onClick={() => setMenuOpen(true)}
             aria-label="Open menu"
           >
             <i className="bi bi-list"></i>
-            <span>Menu</span>
           </button>
-        </div>
 
-        {/* KGSC ID card */}
-        <div className="ud-idcard">
           <div className="ud-idcard-rings" aria-hidden="true">
             <svg viewBox="0 0 400 220" preserveAspectRatio="xMidYMid slice">
               <circle
@@ -111,11 +107,6 @@ export default function UserDashboard() {
           </div>
           <div className="ud-idcard-top">
             <span className="ud-idcard-brand">KGSC · SINCE 1988</span>
-            <span
-              className={`ud-idcard-status ${user.status === "approved" ? "is-active" : "is-pending"}`}
-            >
-              {user.status === "approved" ? "Active" : "Pending"}
-            </span>
           </div>
           <div className="ud-idcard-body">
             {user.profilePhotoUrl ? (
@@ -135,6 +126,12 @@ export default function UserDashboard() {
                 {user.membershipId || "KGSC-ID pending"}
               </p>
             </div>
+            <span
+              className={`ud-idcard-status-pill ${user.isProfileComplete ? "is-active" : "is-pending"}`}
+            >
+              <span className="ud-status-dot"></span>
+              {user.isProfileComplete ? "Active member" : "Complete profile"}
+            </span>
           </div>
         </div>
 
@@ -143,8 +140,13 @@ export default function UserDashboard() {
           <p className="ud-list-label">Messages</p>
           {messages.length === 0 ? (
             <div className="ud-empty">
-              <i className="bi bi-inbox"></i>
-              <p>No messages from admin yet.</p>
+              <div className="ud-empty-icon">
+                <i className="bi bi-inbox"></i>
+              </div>
+              <p className="ud-empty-title">All quiet xfor now</p>
+              <p className="ud-empty-sub">
+                Club announcements will show up here.
+              </p>
             </div>
           ) : (
             <ul className="ud-notices-list">
@@ -199,12 +201,12 @@ export default function UserDashboard() {
           <p className="ud-drawer-name">{user.fullName}</p>
           <div className="ud-status-row">
             <span
-              className={`ud-status-dot ${user.status === "approved" ? "is-active" : "is-pending"}`}
+              className={`ud-status-dot ${user.isProfileComplete ? "is-active" : "is-pending"}`}
             ></span>
             <span>
-              {user.status === "approved"
+              {user.isProfileComplete
                 ? "Active member"
-                : "Pending approval"}
+                : "Complete your profile"}
             </span>
           </div>
         </div>

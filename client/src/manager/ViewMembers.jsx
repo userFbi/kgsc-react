@@ -187,6 +187,7 @@ export default function ViewMembers() {
               <table className="member-table">
                 <thead>
                   <tr>
+                    <th>No</th>
                     <th>Member</th>
                     <th>Phone</th>
                     <th>Insurance</th>
@@ -194,8 +195,9 @@ export default function ViewMembers() {
                   </tr>
                 </thead>
                 <tbody>
-                  {paginated.map((m) => (
+                  {paginated.map((m,index) => (
                     <tr key={m._id}>
+                      <td>{index + 1}.</td>
                       <td>
                         <div className="member-name">{m.name}</div>
                       </td>
