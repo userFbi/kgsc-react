@@ -9,5 +9,6 @@ const messageSchema = new mongoose.Schema(
   },
   { timestamps: true },
 );
-
+// Auto-delete messages 7 days after they're created (MongoDB TTL index)
+messageSchema.index({ createdAt: 1 }, { expireAfterSeconds: 7 * 24 * 60 * 60 });
 module.exports = mongoose.model("Message", messageSchema);

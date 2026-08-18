@@ -51,8 +51,10 @@ export default function UserDashboard() {
     if (!dateStr) return "—";
     return new Date(dateStr).toLocaleDateString("en-IN", {
       day: "numeric",
-      month: "long",
+      month: "2-digit",
       year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   }
 
