@@ -149,11 +149,11 @@ export default function Profile() {
   return (
     <div className="pf-page">
       <div className="pf-wrap">
+
+        <div className="pf-card">
         <button className="pf-back" onClick={() => navigate("/dashboard")}>
           <i className="bi bi-arrow-left"></i> Back
         </button>
-
-        <div className="pf-card">
           <div className="pf-head-row">
             <div>
               <h1 className="pf-title">Personal details</h1>

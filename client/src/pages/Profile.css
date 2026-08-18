@@ -40,8 +40,7 @@
 }
 
 .pf-back {
-    margin-top: 10px;
-    margin-left: 10px;
+    margin-bottom: 20px;
     display: inline-flex;
     align-items: center;
     gap: 8px;
