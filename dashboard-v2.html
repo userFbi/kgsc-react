@@ -1,0 +1,1094 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kamlaba Garden Sport Club — Member Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --ink: #11120d;
+        --forest-900: #11120d;
+        --forest-800: #1c1d17;
+        --leaf-400: #d8cfbc;
+        --leaf-300: #ece6d8;
+        --cream-100: #e8e1d1;
+        --paper: #fffaf0;
+        --marigold-500: #565449;
+        --marigold-600: #403f37;
+        --line: rgba(22, 35, 58, 0.14);
+        --line-on-dark: rgba(255, 255, 255, 0.16);
+        --radius-lg: 22px;
+        --radius-md: 14px;
+        --radius-sm: 9px;
+        --shadow-soft: 0 10px 30px rgba(17, 18, 13, 0.14);
+        --shadow-strong: 0 20px 50px rgba(17, 18, 13, 0.32);
+        --font-display: "Fraunces", serif;
+        --font-body: "Inter", sans-serif;
+        --font-mono: "Space Mono", monospace;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background: var(--cream-100);
+        color: var(--ink);
+        font-family: var(--font-body);
+        min-height: 100vh;
+        position: relative;
+        overflow-x: hidden;
+      }
+
+      .field-lines {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        background:
+          radial-gradient(
+            circle at 82% 8%,
+            rgba(216, 207, 188, 0.35),
+            transparent 55%
+          ),
+          radial-gradient(
+            circle at 10% 92%,
+            rgba(86, 84, 73, 0.14),
+            transparent 45%
+          );
+        pointer-events: none;
+      }
+
+      /* ---- Wrap ---- */
+      .wrap {
+        position: relative;
+        z-index: 1;
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 24px 24px 80px;
+      }
+
+      /* ---- Header row (welcome text + menu button) ---- */
+      .dash-header {
+        position: relative;
+        padding-right: 54px;
+        margin-bottom: 28px;
+      }
+
+      .menu-btn {
+        position: absolute;
+        top: 0;
+        right: 0;
+        z-index: 2;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 50%;
+        color: var(--forest-900);
+        cursor: pointer;
+        box-shadow: var(--shadow-soft);
+        transition:
+          background 0.15s ease,
+          border-color 0.15s ease;
+      }
+
+      .menu-btn:hover {
+        background: var(--cream-100);
+        border-color: var(--marigold-500);
+      }
+
+      .menu-btn:focus-visible {
+        outline: 2px solid var(--marigold-500);
+        outline-offset: 2px;
+      }
+
+      .eyebrow {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-family: var(--font-mono);
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--marigold-600);
+        margin-bottom: 14px;
+        opacity: 0;
+        animation: rise 0.6s ease 0.05s forwards;
+      }
+
+      .eyebrow .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--marigold-500);
+      }
+
+      h1 {
+        font-family: var(--font-display);
+        font-weight: 600;
+        font-size: clamp(28px, 6vw, 40px);
+        line-height: 1.05;
+        letter-spacing: -0.01em;
+        color: var(--forest-900);
+        margin: 0 0 8px;
+        opacity: 0;
+        animation: rise 0.7s ease 0.1s forwards;
+      }
+
+      h1 span {
+        color: var(--marigold-500);
+      }
+
+      .lede {
+        font-size: 16px;
+        line-height: 1.55;
+        color: rgba(17, 18, 13, 0.65);
+        max-width: 56ch;
+        margin: 0;
+        opacity: 0;
+        animation: rise 0.7s ease 0.16s forwards;
+      }
+
+      /* ---- Membership overview (mobile-friendly stat list) ---- */
+      .section-card {
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: var(--radius-lg);
+        padding: 22px;
+        box-shadow: var(--shadow-soft);
+        margin-bottom: 20px;
+        opacity: 0;
+        animation: rise 0.7s ease 0.22s forwards;
+      }
+
+      .section-title {
+        font-family: var(--font-display);
+        font-weight: 600;
+        font-size: 17px;
+        letter-spacing: -0.005em;
+        color: var(--forest-900);
+        margin: 0 0 16px;
+      }
+
+      .stat-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .stat-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 14px;
+        border-radius: var(--radius-md);
+        background: var(--cream-100);
+        border: 1px solid var(--line);
+      }
+
+      .stat-row-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--forest-900);
+        color: var(--leaf-300);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .stat-row-icon svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      .stat-row-text {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .stat-row-label {
+        font-family: var(--font-mono);
+        font-size: 10.5px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--marigold-600);
+        margin-bottom: 3px;
+      }
+
+      .stat-row-sub {
+        font-size: 12px;
+        color: rgba(17, 18, 13, 0.5);
+      }
+
+      .stat-row-value {
+        font-family: var(--font-display);
+        font-weight: 600;
+        font-size: 16px;
+        color: var(--forest-900);
+        text-align: right;
+        flex-shrink: 0;
+        white-space: nowrap;
+      }
+
+      /* ---- Announcements ---- */
+      .announce-item {
+        display: flex;
+        gap: 14px;
+        padding: 14px 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .announce-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+      }
+
+      .announce-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--marigold-500);
+        margin-top: 6px;
+        flex-shrink: 0;
+      }
+
+      .announce-title {
+        font-weight: 700;
+        font-size: 14.5px;
+        color: var(--forest-900);
+        margin: 0 0 3px;
+      }
+
+      .announce-text {
+        font-size: 13.5px;
+        color: rgba(17, 18, 13, 0.65);
+        line-height: 1.5;
+        margin: 0 0 4px;
+      }
+
+      .announce-date {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: rgba(17, 18, 13, 0.4);
+      }
+
+      .empty-state {
+        font-size: 13.5px;
+        color: rgba(17, 18, 13, 0.5);
+        text-align: center;
+        padding: 18px 0;
+      }
+
+      /* ---- Quick actions ---- */
+      .actions-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 12px;
+      }
+
+      .action-btn {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 16px;
+        border-radius: var(--radius-md);
+        border: 1.5px solid var(--line);
+        background: var(--cream-100);
+        color: var(--forest-900);
+        font-family: var(--font-body);
+        font-weight: 700;
+        font-size: 13.5px;
+        text-align: left;
+        cursor: pointer;
+        text-decoration: none;
+        transition:
+          border-color 0.15s ease,
+          background 0.15s ease,
+          transform 0.12s ease;
+      }
+
+      .action-btn:hover {
+        border-color: var(--marigold-500);
+        background: var(--paper);
+        transform: translateY(-2px);
+      }
+
+      .action-btn:focus-visible {
+        outline: 2px solid var(--marigold-500);
+        outline-offset: 2px;
+      }
+
+      .action-btn svg {
+        width: 20px;
+        height: 20px;
+        color: var(--marigold-500);
+      }
+
+      footer {
+        margin-top: 20px;
+        font-family: var(--font-mono);
+        font-size: 11.5px;
+        letter-spacing: 0.06em;
+        color: rgba(17, 18, 13, 0.4);
+        text-align: center;
+        line-height: 1.8;
+      }
+
+      @keyframes rise {
+        from {
+          opacity: 0;
+          transform: translateY(14px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation: none !important;
+          transition: none !important;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .wrap {
+          padding: 18px 14px 60px;
+        }
+        .section-card {
+          padding: 16px;
+        }
+        .stat-row {
+          padding: 12px;
+        }
+      }
+
+      .skeleton {
+        display: inline-block;
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 6px;
+        color: transparent !important;
+      }
+
+      .preview-badge {
+        display: none;
+        align-items: center;
+        gap: 8px;
+        max-width: 900px;
+        margin: 0 auto 16px;
+        padding: 10px 16px;
+        border-radius: var(--radius-sm);
+        background: rgba(86, 84, 73, 0.12);
+        border: 1px solid rgba(86, 84, 73, 0.3);
+        color: var(--marigold-600);
+        font-family: var(--font-mono);
+        font-size: 12px;
+        letter-spacing: 0.04em;
+        position: relative;
+        z-index: 1;
+      }
+
+      .preview-badge.show {
+        display: flex;
+      }
+
+      /* ---- Overlay + drawer menu ---- */
+      .overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        z-index: 40;
+        opacity: 0;
+        visibility: hidden;
+        transition:
+          opacity 0.25s ease,
+          visibility 0.25s ease;
+      }
+
+      .overlay.show {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .drawer {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: min(320px, 86vw);
+        background: var(--forest-900);
+        z-index: 50;
+        padding: 20px 20px 24px;
+        transform: translateX(100%);
+        transition: transform 0.28s ease;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .drawer.is-open {
+        transform: translateX(0);
+      }
+
+      .drawer-close {
+        align-self: flex-end;
+        width: 34px;
+        height: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid var(--line-on-dark);
+        border-radius: 50%;
+        color: var(--paper);
+        cursor: pointer;
+        margin-bottom: 10px;
+      }
+
+      .drawer-close:hover {
+        background: rgba(255, 255, 255, 0.12);
+      }
+
+      .drawer-close:focus-visible {
+        outline: 2px solid var(--leaf-300);
+        outline-offset: 2px;
+      }
+
+      .drawer-profile {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 8px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--line-on-dark);
+        margin-bottom: 18px;
+      }
+
+      .drawer-photo {
+        width: 76px;
+        height: 76px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid rgba(255, 255, 255, 0.15);
+        background: rgba(255, 255, 255, 0.06);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-display);
+        font-weight: 600;
+        font-size: 26px;
+        color: var(--paper);
+      }
+
+      .drawer-name {
+        margin: 4px 0 0;
+        font-family: var(--font-display);
+        font-weight: 600;
+        font-size: 18px;
+        color: var(--paper);
+      }
+
+      .drawer-section {
+        margin-bottom: 18px;
+      }
+
+      .drawer-list-label {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.4);
+        margin: 0 0 6px;
+      }
+
+      .drawer-list-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        width: 100%;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--line-on-dark);
+        background: none;
+        border-left: none;
+        border-right: none;
+        border-top: none;
+        text-align: left;
+        text-decoration: none;
+        color: var(--paper);
+        cursor: pointer;
+        font-family: var(--font-body);
+      }
+
+      .drawer-section .drawer-list-row:last-child {
+        border-bottom: none;
+      }
+
+      .drawer-list-icon {
+        width: 32px;
+        height: 32px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.06);
+        border-radius: 50%;
+        color: var(--leaf-300);
+        font-size: 0.85rem;
+      }
+
+      .drawer-list-icon svg {
+        width: 16px;
+        height: 16px;
+      }
+
+      .drawer-list-text {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        font-size: 0.9rem;
+        font-weight: 600;
+      }
+
+      .drawer-list-sub {
+        font-size: 0.76rem;
+        font-weight: 400;
+        color: rgba(255, 255, 255, 0.4);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .drawer-list-row .chevron {
+        color: rgba(255, 255, 255, 0.3);
+        font-size: 0.9rem;
+        flex-shrink: 0;
+      }
+
+      .drawer-logout {
+        margin-top: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        background: rgba(217, 79, 79, 0.12);
+        border: 1px solid rgba(217, 79, 79, 0.35);
+        color: #ff9a8c;
+        border-radius: 999px;
+        padding: 12px 18px;
+        font-family: var(--font-body);
+        font-weight: 700;
+        font-size: 14px;
+        cursor: pointer;
+      }
+
+      .drawer-logout:hover {
+        background: rgba(217, 79, 79, 0.2);
+      }
+
+      .drawer-logout:focus-visible {
+        outline: 2px solid #ff9a8c;
+        outline-offset: 2px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="field-lines"></div>
+
+    <div class="preview-badge" id="previewBadge">
+      ⚠ Preview mode — showing sample data, no backend connected yet
+    </div>
+
+    <div class="wrap">
+      <!-- WELCOME HEADER -->
+      <div class="dash-header">
+        <button class="menu-btn" id="menuBtn" aria-label="Open menu">
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <line x1="4" y1="7" x2="20" y2="7" />
+            <line x1="4" y1="12" x2="20" y2="12" />
+            <line x1="4" y1="17" x2="20" y2="17" />
+          </svg>
+        </button>
+        <div class="eyebrow"><span class="dot"></span>MEMBER DASHBOARD</div>
+        <h1>Welcome back, <span id="greetName">Member</span></h1>
+        <p class="lede">Here's your membership at a glance.</p>
+      </div>
+
+      <!-- MEMBERSHIP OVERVIEW (mobile-friendly stat list) -->
+      <div class="section-card">
+        <h3 class="section-title">Membership overview</h3>
+        <div class="stat-list">
+          <div class="stat-row">
+            <div class="stat-row-icon">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+            </div>
+            <div class="stat-row-text">
+              <div class="stat-row-label">Membership</div>
+              <div class="stat-row-sub">Renews annually</div>
+            </div>
+            <div class="stat-row-value" id="statMembership">Active</div>
+          </div>
+
+          <div class="stat-row">
+            <div class="stat-row-icon">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M12 2l8 4v6c0 5-3.4 8.4-8 10-4.6-1.6-8-5-8-10V6l8-4z"
+                />
+              </svg>
+            </div>
+            <div class="stat-row-text">
+              <div class="stat-row-label">Insurance</div>
+              <div class="stat-row-sub">Club coverage status</div>
+            </div>
+            <div class="stat-row-value" id="statInsurance">—</div>
+          </div>
+
+          <div class="stat-row">
+            <div class="stat-row-icon">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="3" y="4" width="18" height="18" rx="2" />
+                <line x1="16" y1="2" x2="16" y2="6" />
+                <line x1="8" y1="2" x2="8" y2="6" />
+                <line x1="3" y1="10" x2="21" y2="10" />
+              </svg>
+            </div>
+            <div class="stat-row-text">
+              <div class="stat-row-label">Years with club</div>
+              <div class="stat-row-sub">Since 1988</div>
+            </div>
+            <div class="stat-row-value" id="statYears">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ANNOUNCEMENTS -->
+      <div class="section-card">
+        <h3 class="section-title">Club announcements</h3>
+        <div id="announceList">
+          <div class="empty-state">Loading announcements…</div>
+        </div>
+      </div>
+
+      <!-- QUICK ACTIONS -->
+      <div class="section-card">
+        <h3 class="section-title">Quick actions</h3>
+        <div class="actions-row">
+          <button class="action-btn" id="editProfileBtn">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M12 20h9" />
+              <path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
+            </svg>
+            Edit Profile
+          </button>
+          <a
+            class="action-btn"
+            href="https://wa.me/9725720612"
+            target="_blank"
+            rel="noopener"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"
+              />
+            </svg>
+            Contact Club
+          </a>
+          <button class="action-btn" id="viewMembershipBtn">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+              <line x1="1" y1="10" x2="23" y2="10" />
+            </svg>
+            View Membership Details
+          </button>
+        </div>
+      </div>
+
+      <footer>
+        KAMLABA GARDEN SPORT CLUB — EST. <span id="currentYear"></span>
+      </footer>
+    </div>
+
+    <!-- Overlay + drawer menu -->
+    <div class="overlay" id="overlay"></div>
+    <aside class="drawer" id="drawer">
+      <button class="drawer-close" id="drawerClose" aria-label="Close menu">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+
+      <div class="drawer-profile">
+        <div class="drawer-photo" id="drawerPhoto">M</div>
+        <p class="drawer-name" id="drawerName">—</p>
+      </div>
+
+      <div class="drawer-section">
+        <p class="drawer-list-label">Profile</p>
+        <a href="/edit-profile.html" class="drawer-list-row">
+          <span class="drawer-list-icon">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+          </span>
+          <span class="drawer-list-text">
+            <span>Personal details</span>
+            <span class="drawer-list-sub" id="drawerEmail">—</span>
+          </span>
+          <span class="chevron">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </span>
+        </a>
+      </div>
+
+      <div class="drawer-section">
+        <p class="drawer-list-label">Need help?</p>
+        <a
+          href="https://wa.me/9725720612"
+          target="_blank"
+          rel="noopener"
+          class="drawer-list-row"
+        >
+          <span class="drawer-list-icon">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M3 11a9 9 0 0118 0v5a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3"
+              />
+              <path d="M3 11v5a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3" />
+            </svg>
+          </span>
+          <span class="drawer-list-text">
+            <span>Contact admin</span>
+          </span>
+          <span class="chevron">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </span>
+        </a>
+      </div>
+
+      <button class="drawer-logout" id="logoutBtn">
+        <svg
+          width="15"
+          height="15"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+          <polyline points="16 17 21 12 16 7" />
+          <line x1="21" y1="12" x2="9" y2="12" />
+        </svg>
+        Log out
+      </button>
+    </aside>
+
+    <script>
+      document.getElementById("currentYear").textContent =
+        new Date().getFullYear();
+
+      // 👇 replace with your live KGSC backend endpoints
+      const ME_API_URL = "https://kgsc-server.onrender.com/api/member/me";
+      const ANNOUNCEMENTS_API_URL =
+        "https://kgsc-server.onrender.com/api/messages";
+      const LOGIN_PAGE_URL = "/login.html";
+
+      // Set this to false once your login/signup backend is live —
+      // it currently lets you preview this page even without a real token.
+      const ALLOW_PREVIEW = true;
+
+      const token = localStorage.getItem("kgsc_token");
+      const previewBadge = document.getElementById("previewBadge");
+
+      const DEMO_MEMBER = {
+        name: "Tushar Pawar",
+        membershipId: "KGSC-0001",
+        phone: "98765 43210",
+        email: "tushar@example.com",
+        aadhar: "123456789012",
+        memberSince: "2024",
+        status: "Active",
+        insured: true,
+        yearsWithClub: 2,
+      };
+
+      const DEMO_ANNOUNCEMENTS = [
+        {
+          title: "Ganesh Chaturthi Celebration",
+          body: "Join us this weekend for the festival setup and celebrations at the club ground.",
+          date: new Date().toISOString(),
+        },
+        {
+          title: "Membership Renewal Reminder",
+          body: "Annual membership renewals are open. Please complete yours before the 30th.",
+          date: new Date(Date.now() - 3 * 86400000).toISOString(),
+        },
+      ];
+
+      if (!token && !ALLOW_PREVIEW) {
+        window.location.href = LOGIN_PAGE_URL;
+      }
+      if (!token && ALLOW_PREVIEW) {
+        previewBadge.classList.add("show");
+      }
+
+      const greetName = document.getElementById("greetName");
+      const statMembership = document.getElementById("statMembership");
+      const statInsurance = document.getElementById("statInsurance");
+      const statYears = document.getElementById("statYears");
+      const announceList = document.getElementById("announceList");
+
+      const drawerPhoto = document.getElementById("drawerPhoto");
+      const drawerName = document.getElementById("drawerName");
+      const drawerEmail = document.getElementById("drawerEmail");
+
+      function renderMember(member) {
+        const name = member.name || "Member";
+        const initial = name.charAt(0).toUpperCase();
+
+        greetName.textContent = name.split(" ")[0];
+
+        statMembership.textContent = member.status || "Active";
+        statInsurance.textContent = member.insured ? "Insured" : "Not Insured";
+        statYears.textContent =
+          member.yearsWithClub != null ? member.yearsWithClub : "—";
+
+        // Drawer
+        drawerPhoto.textContent = initial;
+        drawerName.textContent = name;
+        drawerEmail.textContent = member.email || "—";
+      }
+
+      async function loadMember() {
+        if (!token) {
+          renderMember(DEMO_MEMBER);
+          return;
+        }
+        try {
+          const res = await fetch(ME_API_URL, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (!res.ok) throw new Error("Unauthorized");
+          const data = await res.json();
+          renderMember(data.member || data);
+        } catch (err) {
+          if (ALLOW_PREVIEW) {
+            previewBadge.classList.add("show");
+            renderMember(DEMO_MEMBER);
+          } else {
+            localStorage.removeItem("kgsc_token");
+            window.location.href = LOGIN_PAGE_URL;
+          }
+        }
+      }
+
+      function renderAnnouncements(messages) {
+        if (!messages || messages.length === 0) {
+          announceList.innerHTML =
+            '<div class="empty-state">No announcements yet.</div>';
+          return;
+        }
+        announceList.innerHTML = messages
+          .map(
+            (m) => `
+            <div class="announce-item">
+              <div class="announce-dot"></div>
+              <div>
+                <p class="announce-title">${m.title || "Announcement"}</p>
+                <p class="announce-text">${m.body || m.text || ""}</p>
+                <span class="announce-date">${m.date ? new Date(m.date).toLocaleDateString() : ""}</span>
+              </div>
+            </div>`,
+          )
+          .join("");
+      }
+
+      async function loadAnnouncements() {
+        if (!token) {
+          renderAnnouncements(DEMO_ANNOUNCEMENTS);
+          return;
+        }
+        try {
+          const res = await fetch(ANNOUNCEMENTS_API_URL, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (!res.ok) throw new Error("Failed to load");
+          const data = await res.json();
+          renderAnnouncements(data.messages || data);
+        } catch (err) {
+          if (ALLOW_PREVIEW) {
+            renderAnnouncements(DEMO_ANNOUNCEMENTS);
+          } else {
+            announceList.innerHTML =
+              '<div class="empty-state">Couldn\'t load announcements.</div>';
+          }
+        }
+      }
+
+      loadMember();
+      loadAnnouncements();
+
+      document
+        .getElementById("editProfileBtn")
+        .addEventListener("click", () => {
+          window.location.href = "/edit-profile.html";
+        });
+
+      document
+        .getElementById("viewMembershipBtn")
+        .addEventListener("click", () => {
+          document
+            .querySelector(".section-card")
+            .scrollIntoView({ behavior: "smooth", block: "center" });
+        });
+
+      // Drawer menu open/close
+      const menuBtn = document.getElementById("menuBtn");
+      const overlay = document.getElementById("overlay");
+      const drawer = document.getElementById("drawer");
+      const drawerClose = document.getElementById("drawerClose");
+
+      function openDrawer() {
+        drawer.classList.add("is-open");
+        overlay.classList.add("show");
+      }
+
+      function closeDrawer() {
+        drawer.classList.remove("is-open");
+        overlay.classList.remove("show");
+      }
+
+      menuBtn.addEventListener("click", openDrawer);
+      drawerClose.addEventListener("click", closeDrawer);
+      overlay.addEventListener("click", closeDrawer);
+
+      document.getElementById("logoutBtn").addEventListener("click", () => {
+        localStorage.removeItem("kgsc_token");
+        window.location.href = LOGIN_PAGE_URL;
+      });
+    </script>
+  </body>
+</html>

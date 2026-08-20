@@ -1,0 +1,1176 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kamlaba Garden Sport Club — Login / Sign Up</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --ink: #11120d;
+        --forest-900: #11120d;
+        --forest-800: #1c1d17;
+        --forest-700: #565449;
+        --leaf-400: #d8cfbc;
+        --leaf-300: #ece6d8;
+        --cream-100: #e8e1d1;
+        --paper: #fffaf0;
+        --marigold-500: #565449;
+        --marigold-600: #403f37;
+        --line: rgba(22, 35, 58, 0.14);
+        --line-on-dark: rgba(255, 255, 255, 0.16);
+        --radius-lg: 22px;
+        --radius-md: 14px;
+        --radius-sm: 9px;
+        --shadow-soft: 0 10px 30px rgba(17, 18, 13, 0.14);
+        --shadow-strong: 0 20px 50px rgba(17, 18, 13, 0.32);
+        --font-display: "Fraunces", serif;
+        --font-body: "Inter", sans-serif;
+        --font-mono: "Space Mono", monospace;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background: linear-gradient(
+          180deg,
+          var(--forest-900) 0%,
+          var(--forest-800) 55%,
+          #0a0a08 100%
+        );
+        color: var(--ink);
+        font-family: var(--font-body);
+        min-height: 100vh;
+        position: relative;
+        overflow-x: hidden;
+      }
+
+      .field-lines {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        background:
+          radial-gradient(
+            circle at 82% 8%,
+            rgba(216, 207, 188, 0.14),
+            transparent 55%
+          ),
+          radial-gradient(
+            circle at 10% 92%,
+            rgba(86, 84, 73, 0.3),
+            transparent 45%
+          );
+        pointer-events: none;
+      }
+
+      .wrap {
+        position: relative;
+        z-index: 1;
+        max-width: 640px;
+        margin: 0 auto;
+        padding: 56px 24px 80px;
+      }
+
+      .eyebrow {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-family: var(--font-mono);
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--leaf-300);
+        margin-bottom: 18px;
+        opacity: 0;
+        animation: rise 0.6s ease forwards;
+      }
+
+      .eyebrow .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--marigold-500);
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        backdrop-filter: blur(6px);
+        color: var(--paper);
+        font-family: var(--font-display);
+        font-weight: 600;
+        font-size: 24px;
+        letter-spacing: 0.02em;
+        margin-bottom: 24px;
+        opacity: 0;
+        animation: rise 0.6s ease 0.1s forwards;
+      }
+
+      h1 {
+        font-family: var(--font-display);
+        font-weight: 600;
+        font-size: clamp(36px, 8vw, 56px);
+        line-height: 1;
+        letter-spacing: -0.01em;
+        color: var(--paper);
+        margin: 0 0 14px;
+        opacity: 0;
+        animation: rise 0.7s ease 0.15s forwards;
+      }
+
+      h1 span {
+        color: var(--marigold-500);
+        display: block;
+        font-weight: 500;
+      }
+
+      .lede {
+        font-size: 17px;
+        line-height: 1.55;
+        color: var(--leaf-300);
+        max-width: 46ch;
+        margin: 0 0 40px;
+        opacity: 0;
+        animation: rise 0.7s ease 0.22s forwards;
+      }
+
+      .card {
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: var(--radius-lg);
+        padding: 32px;
+        box-shadow: var(--shadow-strong);
+        opacity: 0;
+        animation: rise 0.7s ease 0.3s forwards;
+      }
+
+      /* Tabs */
+      .tabs {
+        display: flex;
+        background: var(--cream-100);
+        border-radius: var(--radius-sm);
+        padding: 4px;
+        margin-bottom: 24px;
+        border: 1px solid var(--line);
+      }
+
+      .tab-btn {
+        flex: 1;
+        padding: 12px 10px;
+        border: none;
+        background: transparent;
+        border-radius: 9px;
+        font-family: var(--font-body);
+        font-weight: 700;
+        font-size: 14px;
+        letter-spacing: 0.01em;
+        color: rgba(17, 18, 13, 0.5);
+        cursor: pointer;
+        transition:
+          background 0.2s ease,
+          color 0.2s ease;
+      }
+
+      .tab-btn.active {
+        background: var(--forest-900);
+        color: var(--paper);
+      }
+
+      .tab-btn:focus-visible {
+        outline: 2px solid var(--marigold-500);
+        outline-offset: 2px;
+      }
+
+      .card-label {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--marigold-600);
+        margin-bottom: 6px;
+      }
+
+      .card-title {
+        font-family: var(--font-display);
+        font-weight: 600;
+        font-size: 24px;
+        letter-spacing: -0.01em;
+        color: var(--forest-900);
+        margin: 0 0 22px;
+      }
+
+      form {
+        display: none;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      form.active {
+        display: flex;
+      }
+
+      label {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--forest-900);
+        margin-bottom: -8px;
+      }
+
+      input[type="text"],
+      input[type="number"],
+      input[type="password"] {
+        width: 100%;
+        padding: 15px 16px;
+        border-radius: var(--radius-sm);
+        border: 1.5px solid var(--line);
+        background: var(--cream-100);
+        font-family: var(--font-body);
+        font-size: 16px;
+        color: var(--ink);
+        outline: none;
+        transition:
+          border-color 0.15s ease,
+          background 0.15s ease;
+      }
+
+      input[type="text"]:focus,
+      input[type="number"]:focus,
+      input[type="password"]:focus {
+        border-color: var(--marigold-500);
+        background: #fff;
+      }
+
+      input[type="text"]:focus-visible,
+      input[type="number"]:focus-visible,
+      input[type="password"]:focus-visible {
+        outline: 2px solid var(--marigold-500);
+        outline-offset: 2px;
+      }
+
+      button[type="submit"],
+      .btn-next {
+        margin-top: 6px;
+        padding: 16px 20px;
+        border: none;
+        border-radius: var(--radius-sm);
+        background: var(--forest-900);
+        color: var(--paper);
+        font-family: var(--font-body);
+        font-weight: 700;
+        font-size: 16px;
+        letter-spacing: 0.01em;
+        cursor: pointer;
+        transition:
+          transform 0.12s ease,
+          background 0.15s ease;
+      }
+
+      button[type="submit"]:hover,
+      .btn-next:hover {
+        background: var(--forest-800);
+      }
+
+      button[type="submit"]:active,
+      .btn-next:active {
+        transform: scale(0.98);
+      }
+
+      button[type="submit"]:focus-visible,
+      .btn-next:focus-visible {
+        outline: 2px solid var(--marigold-500);
+        outline-offset: 2px;
+      }
+
+      button[type="submit"]:disabled,
+      .btn-next:disabled {
+        opacity: 0.6;
+        cursor: default;
+      }
+
+      .error {
+        font-size: 13px;
+        color: #b23a2f;
+        display: none;
+      }
+
+      .error.show {
+        display: block;
+      }
+
+      .confirm {
+        display: none;
+        text-align: center;
+        padding: 8px 4px 4px;
+      }
+
+      .confirm.show {
+        display: block;
+      }
+
+      .confirm .num {
+        margin-bottom: 6px;
+      }
+
+      .confirm p {
+        font-size: 15px;
+        color: rgba(17, 18, 13, 0.72);
+        margin: 0 0 4px;
+      }
+
+      .confirm strong {
+        color: var(--forest-900);
+      }
+
+      form.hide {
+        display: none;
+      }
+
+      .tabs.hide {
+        display: none;
+      }
+
+      footer {
+        margin-top: 44px;
+        font-family: var(--font-mono);
+        font-size: 11.5px;
+        letter-spacing: 0.06em;
+        color: rgba(255, 255, 255, 0.45);
+        text-align: center;
+        line-height: 1.8;
+      }
+
+      footer a {
+        color: var(--leaf-300);
+        text-decoration: none;
+        border-bottom: 1px solid rgba(216, 207, 188, 0.35);
+        transition:
+          color 0.15s ease,
+          border-color 0.15s ease;
+      }
+
+      footer a:hover {
+        color: var(--marigold-500);
+        border-color: var(--marigold-500);
+      }
+
+      footer a:focus-visible {
+        outline: 2px solid var(--marigold-500);
+        outline-offset: 2px;
+      }
+
+      @keyframes rise {
+        from {
+          opacity: 0;
+          transform: translateY(14px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation: none !important;
+          transition: none !important;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .wrap {
+          padding: 40px 18px 60px;
+        }
+        .card {
+          padding: 24px 20px;
+        }
+      }
+
+      .wa-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 26px;
+        padding: 15px 26px;
+        border-radius: 999px;
+        background: #25d366;
+        color: #fff;
+        font-family: var(--font-body);
+        font-weight: 700;
+        font-size: 15px;
+        text-decoration: none;
+        box-shadow: 0 8px 20px -8px rgba(37, 211, 102, 0.6);
+        transition:
+          transform 0.12s ease,
+          background 0.15s ease,
+          box-shadow 0.15s ease;
+      }
+
+      .wa-btn svg {
+        flex-shrink: 0;
+      }
+
+      .wa-btn:hover {
+        background: #20bd5a;
+        box-shadow: 0 10px 24px -8px rgba(37, 211, 102, 0.7);
+      }
+
+      .wa-btn:active {
+        transform: scale(0.97);
+      }
+
+      .wa-btn:focus-visible {
+        outline: 2px solid var(--forest-900);
+        outline-offset: 3px;
+      }
+
+      .divider {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 4px 0 -2px;
+        color: rgba(17, 18, 13, 0.4);
+        font-family: var(--font-mono);
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .divider::before,
+      .divider::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: var(--line);
+      }
+
+      .google-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
+        padding: 14px 18px;
+        border-radius: var(--radius-sm);
+        border: 1.5px solid var(--line);
+        background: #fff;
+        color: var(--ink);
+        font-family: var(--font-body);
+        font-weight: 600;
+        font-size: 15px;
+        cursor: pointer;
+        transition:
+          border-color 0.15s ease,
+          background 0.15s ease;
+      }
+
+      .google-btn:hover {
+        border-color: var(--marigold-500);
+        background: var(--cream-100);
+      }
+
+      .google-btn:focus-visible {
+        outline: 2px solid var(--marigold-500);
+        outline-offset: 2px;
+      }
+
+      .step {
+        display: none;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .step.active {
+        display: flex;
+      }
+
+      .step-track {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 4px;
+      }
+
+      .step-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--line);
+        transition:
+          background 0.2s ease,
+          transform 0.2s ease;
+      }
+
+      .step-dot.done {
+        background: var(--marigold-500);
+      }
+
+      .step-dot.current {
+        background: var(--forest-900);
+        transform: scale(1.3);
+      }
+
+      .step-bar {
+        flex: 1;
+        height: 2px;
+        background: var(--line);
+        border-radius: 2px;
+        overflow: hidden;
+      }
+
+      .step-bar span {
+        display: block;
+        height: 100%;
+        width: 0%;
+        background: var(--marigold-500);
+        transition: width 0.25s ease;
+      }
+
+      .step-bar.done span {
+        width: 100%;
+      }
+
+      .step-label {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--marigold-600);
+        margin: -4px 0 2px;
+      }
+
+      .btn-row {
+        display: flex;
+        gap: 12px;
+        margin-top: 6px;
+      }
+
+      .btn-row button[type="submit"],
+      .btn-row .btn-next {
+        flex: 1;
+      }
+
+      .btn-back {
+        flex: 1;
+        padding: 16px 20px;
+        border: 1.5px solid var(--line);
+        border-radius: var(--radius-sm);
+        background: #fff;
+        color: var(--forest-900);
+        font-family: var(--font-body);
+        font-weight: 700;
+        font-size: 16px;
+        cursor: pointer;
+        transition:
+          border-color 0.15s ease,
+          background 0.15s ease;
+      }
+
+      .btn-back:hover {
+        border-color: var(--marigold-500);
+        background: var(--cream-100);
+      }
+
+      .btn-back:focus-visible {
+        outline: 2px solid var(--marigold-500);
+        outline-offset: 2px;
+      }
+
+      .field-wrap {
+        position: relative;
+      }
+
+      .field-wrap input {
+        padding-right: 46px;
+      }
+
+      .toggle-pw {
+        position: absolute;
+        right: 6px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 34px;
+        height: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--marigold-600);
+        padding: 0;
+        border-radius: 8px;
+      }
+
+      .toggle-pw:hover {
+        background: var(--cream-100);
+      }
+
+      .toggle-pw:focus-visible {
+        outline: 2px solid var(--marigold-500);
+        outline-offset: 2px;
+      }
+
+      .toggle-pw svg {
+        width: 20px;
+        height: 20px;
+      }
+
+      .toggle-pw .eye-off {
+        display: none;
+      }
+
+      .toggle-pw.shown .eye-on {
+        display: none;
+      }
+
+      .toggle-pw.shown .eye-off {
+        display: block;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="field-lines"></div>
+
+    <div class="wrap">
+      <div class="badge">KG<br /></div>
+      <h1>Kamlaba Garden<br /><span>Sport Club</span></h1>
+      <p class="lede">
+        Log in to your member account, or sign up to join the club.
+      </p>
+
+      <div class="card">
+        <div class="tabs" id="tabs">
+          <button type="button" class="tab-btn active" id="loginTabBtn">
+            Login
+          </button>
+          <button type="button" class="tab-btn" id="signupTabBtn">
+            Sign Up
+          </button>
+        </div>
+
+        <h2 class="card-title" id="cardTitle">Log in to your account</h2>
+
+        <!-- LOGIN FORM -->
+        <form id="loginForm" class="active">
+          <label for="loginIdentifier">Phone number or Member ID</label>
+          <input
+            type="text"
+            id="loginIdentifier"
+            name="identifier"
+            placeholder="e.g. 98765 43210 or KGSC-0001"
+            autocomplete="username"
+            required
+          />
+
+          <label for="loginPassword">Password</label>
+          <div class="field-wrap">
+            <input
+              type="password"
+              id="loginPassword"
+              name="password"
+              placeholder="Enter your password"
+              autocomplete="current-password"
+              required
+            />
+            <button
+              type="button"
+              class="toggle-pw"
+              data-target="loginPassword"
+              aria-label="Show password"
+            >
+              <svg
+                class="eye-on"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M1.5 12s4-7.5 10.5-7.5S22.5 12 22.5 12s-4 7.5-10.5 7.5S1.5 12 1.5 12z"
+                />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+              <svg
+                class="eye-off"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M3 3l18 18" />
+                <path
+                  d="M10.6 5.1A10.9 10.9 0 0112 5c6.5 0 10.5 7 10.5 7a13.5 13.5 0 01-3.1 3.9M6.6 6.6C3.5 8.5 1.5 12 1.5 12s4 7 10.5 7a10.7 10.7 0 004.4-.9"
+                />
+                <path d="M9.9 9.9a3 3 0 004.2 4.2" />
+              </svg>
+            </button>
+          </div>
+
+          <div class="error" id="loginError">Please fill in all fields.</div>
+          <button type="submit" id="loginSubmitBtn">Log In</button>
+
+          <div class="divider">or</div>
+          <button type="button" class="google-btn" id="googleLoginBtn">
+            <svg width="18" height="18" viewBox="0 0 48 48">
+              <path
+                fill="#FFC107"
+                d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.6-6 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6.1 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"
+              />
+              <path
+                fill="#FF3D00"
+                d="M6.3 14.7l6.6 4.8C14.6 15.9 18.9 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6.1 29.6 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"
+              />
+              <path
+                fill="#4CAF50"
+                d="M24 44c5.5 0 10.4-2.1 14.1-5.6l-6.5-5.5c-2 1.5-4.6 2.4-7.6 2.4-5.3 0-9.7-3.4-11.3-8.1l-6.6 5.1C9.6 39.6 16.2 44 24 44z"
+              />
+              <path
+                fill="#1976D2"
+                d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.2 4.2-4.2 5.6l6.5 5.5C41.4 36 44 30.6 44 24c0-1.3-.1-2.7-.4-3.5z"
+              />
+            </svg>
+            Continue with Google
+          </button>
+        </form>
+
+        <!-- SIGNUP FORM -->
+        <form id="signupForm">
+          <div class="step-track">
+            <div class="step-bar" id="stepBar"><span></span></div>
+          </div>
+          <div class="step-label" id="stepLabel">Step 1 of 2</div>
+
+          <!-- STEP 1 -->
+          <div class="step active" id="signupStep1">
+            <label for="nameInput">Full name</label>
+            <input
+              type="text"
+              id="nameInput"
+              name="name"
+              placeholder="e.g. Tushar Pawar"
+              autocomplete="name"
+              required
+            />
+
+            <label for="phoneInput">Phone number</label>
+            <input
+              type="text"
+              id="phoneInput"
+              name="phone"
+              placeholder="e.g. 98765 43210"
+              autocomplete="tel"
+              inputmode="tel"
+              required
+            />
+
+            <label for="signupPassword">Create password</label>
+            <div class="field-wrap">
+              <input
+                type="password"
+                id="signupPassword"
+                name="password"
+                placeholder="Create a password"
+                minlength="6"
+                autocomplete="new-password"
+                required
+              />
+              <button
+                type="button"
+                class="toggle-pw"
+                data-target="signupPassword"
+                aria-label="Show password"
+              >
+                <svg
+                  class="eye-on"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M1.5 12s4-7.5 10.5-7.5S22.5 12 22.5 12s-4 7.5-10.5 7.5S1.5 12 1.5 12z"
+                  />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+                <svg
+                  class="eye-off"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M3 3l18 18" />
+                  <path
+                    d="M10.6 5.1A10.9 10.9 0 0112 5c6.5 0 10.5 7 10.5 7a13.5 13.5 0 01-3.1 3.9M6.6 6.6C3.5 8.5 1.5 12 1.5 12s4 7 10.5 7a10.7 10.7 0 004.4-.9"
+                  />
+                  <path d="M9.9 9.9a3 3 0 004.2 4.2" />
+                </svg>
+              </button>
+            </div>
+
+            <div class="error" id="signupErrorStep1">
+              Please fill in all fields.
+            </div>
+            <button type="button" class="btn-next" id="toStep2Btn">Next</button>
+
+            <div class="divider">or</div>
+            <button type="button" class="google-btn" id="googleSignupBtn">
+              <svg width="18" height="18" viewBox="0 0 48 48">
+                <path
+                  fill="#FFC107"
+                  d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.6-6 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6.1 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"
+                />
+                <path
+                  fill="#FF3D00"
+                  d="M6.3 14.7l6.6 4.8C14.6 15.9 18.9 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6.1 29.6 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"
+                />
+                <path
+                  fill="#4CAF50"
+                  d="M24 44c5.5 0 10.4-2.1 14.1-5.6l-6.5-5.5c-2 1.5-4.6 2.4-7.6 2.4-5.3 0-9.7-3.4-11.3-8.1l-6.6 5.1C9.6 39.6 16.2 44 24 44z"
+                />
+                <path
+                  fill="#1976D2"
+                  d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.2 4.2-4.2 5.6l6.5 5.5C41.4 36 44 30.6 44 24c0-1.3-.1-2.7-.4-3.5z"
+                />
+              </svg>
+              Continue with Google
+            </button>
+          </div>
+
+          <!-- STEP 2 -->
+          <div class="step" id="signupStep2">
+            <label for="aadharInput">Aadhar card number</label>
+            <input
+              type="text"
+              id="aadharInput"
+              name="aadhar"
+              placeholder="e.g. 123456789012"
+              inputmode="numeric"
+              maxlength="12"
+              required
+            />
+
+            <label for="emailInput">Email ID</label>
+            <input
+              type="text"
+              id="emailInput"
+              name="email"
+              placeholder="e.g. you@email.com"
+              autocomplete="email"
+              required
+            />
+
+            <div class="error" id="signupErrorStep2">
+              Please fill in all fields.
+            </div>
+            <div class="btn-row">
+              <button type="button" class="btn-back" id="backToStep1Btn">
+                Back
+              </button>
+              <button type="submit" id="signupSubmitBtn">Join the group</button>
+            </div>
+          </div>
+        </form>
+
+        <div class="confirm" id="confirmBox">
+          <svg
+            class="num"
+            width="44"
+            height="44"
+            viewBox="0 0 24 24"
+            fill="none"
+            style="margin: 0 auto 10px"
+          >
+            <circle
+              cx="12"
+              cy="12"
+              r="11"
+              stroke="#4c7a3d"
+              stroke-width="1.5"
+            />
+            <path
+              d="M7 12.5L10.5 16L17 8.5"
+              stroke="#1f3d2b"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <p style="margin-bottom: 10px">
+            You're in, <strong id="confirmName"></strong>.
+          </p>
+          <p>See you at Kamlaba Garden Sport Club!</p>
+          <a href="#" id="waBtn" class="wa-btn" target="_blank" rel="noopener">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2ZM12.04 3.67C14.25 3.67 16.32 4.53 17.89 6.1C19.45 7.67 20.31 9.74 20.31 11.92C20.31 16.46 16.58 20.17 12.03 20.17C10.56 20.17 9.12 19.78 7.85 19.04L7.55 18.87L4.43 19.7L5.28 16.66L5.08 16.34C4.27 15.03 3.84 13.5 3.84 11.91C3.85 7.37 7.5 3.67 12.04 3.67ZM8.53 6.85C8.37 6.85 8.1 6.91 7.88 7.15C7.66 7.39 7.03 7.98 7.03 9.19C7.03 10.4 7.9 11.56 8.02 11.72C8.14 11.88 9.71 14.44 12.19 15.44C14.26 16.28 14.68 16.11 15.13 16.07C15.58 16.03 16.57 15.49 16.77 14.93C16.98 14.37 16.98 13.89 16.92 13.79C16.86 13.69 16.7 13.63 16.46 13.51C16.22 13.39 15.03 12.8 14.81 12.72C14.59 12.64 14.43 12.6 14.27 12.84C14.11 13.08 13.65 13.63 13.51 13.79C13.37 13.95 13.23 13.97 12.99 13.85C12.75 13.73 11.97 13.47 11.04 12.65C10.32 12.01 9.83 11.22 9.69 10.98C9.55 10.74 9.67 10.61 9.79 10.49C9.9 10.38 10.03 10.2 10.15 10.06C10.27 9.92 10.31 9.82 10.39 9.66C10.47 9.5 10.43 9.36 10.37 9.24C10.31 9.12 9.83 7.93 9.61 7.44C9.42 7.02 9.22 6.99 9.05 6.98C8.9 6.97 8.72 6.85 8.53 6.85Z"
+              />
+            </svg>
+            Chat on WhatsApp
+          </a>
+        </div>
+      </div>
+
+      <footer>
+        KAMLABA GARDEN SPORT CLUB — EST. <span id="currentYear"></span>
+      </footer>
+    </div>
+
+    <script>
+      document.getElementById("currentYear").textContent =
+        new Date().getFullYear();
+
+      const LOGIN_API_URL = "https://kgsc-server.onrender.com/api/auth/login";
+      const SIGNUP_API_URL = "https://kgsc-server.onrender.com/api/submit";
+      const CLUB_WHATSAPP_NUMBER = "9725720612";
+
+      const tabs = document.getElementById("tabs");
+      const loginTabBtn = document.getElementById("loginTabBtn");
+      const signupTabBtn = document.getElementById("signupTabBtn");
+      const loginForm = document.getElementById("loginForm");
+      const signupForm = document.getElementById("signupForm");
+      const cardTitle = document.getElementById("cardTitle");
+      const signupStep1 = document.getElementById("signupStep1");
+      const signupStep2 = document.getElementById("signupStep2");
+      const stepBar = document.getElementById("stepBar");
+      const stepLabel = document.getElementById("stepLabel");
+
+      function goToStep(step) {
+        const isStep1 = step === 1;
+        signupStep1.classList.toggle("active", isStep1);
+        signupStep2.classList.toggle("active", !isStep1);
+        stepBar.classList.toggle("done", !isStep1);
+        stepLabel.textContent = isStep1 ? "Step 1 of 2" : "Step 2 of 2";
+      }
+
+      function activateTab(tab) {
+        const isLogin = tab === "login";
+        loginTabBtn.classList.toggle("active", isLogin);
+        signupTabBtn.classList.toggle("active", !isLogin);
+        loginForm.classList.toggle("active", isLogin);
+        signupForm.classList.toggle("active", !isLogin);
+        cardTitle.textContent = isLogin
+          ? "Log in to your account"
+          : "Enter your details";
+        if (!isLogin) goToStep(1);
+      }
+
+      loginTabBtn.addEventListener("click", () => activateTab("login"));
+      signupTabBtn.addEventListener("click", () => activateTab("signup"));
+
+      // Show/hide password
+      document.querySelectorAll(".toggle-pw").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const target = document.getElementById(btn.dataset.target);
+          const isHidden = target.type === "password";
+          target.type = isHidden ? "text" : "password";
+          btn.classList.toggle("shown", isHidden);
+          btn.setAttribute(
+            "aria-label",
+            isHidden ? "Hide password" : "Show password",
+          );
+        });
+      });
+
+      // Aadhar: digits only, exactly 12
+      const aadharInputEl = document.getElementById("aadharInput");
+      aadharInputEl.addEventListener("input", () => {
+        aadharInputEl.value = aadharInputEl.value
+          .replace(/\D/g, "")
+          .slice(0, 12);
+      });
+
+      // LOGIN submit
+      const loginError = document.getElementById("loginError");
+      const loginSubmitBtn = document.getElementById("loginSubmitBtn");
+
+      loginForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const identifier = document
+          .getElementById("loginIdentifier")
+          .value.trim();
+        const password = document.getElementById("loginPassword").value;
+
+        if (!identifier || !password) {
+          loginError.textContent = "Please fill in all fields.";
+          loginError.classList.add("show");
+          return;
+        }
+
+        loginError.classList.remove("show");
+        loginSubmitBtn.disabled = true;
+        loginSubmitBtn.textContent = "Logging in…";
+
+        try {
+          const res = await fetch(LOGIN_API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ identifier, password }),
+          });
+
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.message || "Login failed");
+
+          localStorage.setItem("kgsc_token", data.token);
+          window.location.href = "/dashboard.html";
+        } catch (err) {
+          loginError.textContent =
+            err.message || "Something went wrong. Please try again.";
+          loginError.classList.add("show");
+        } finally {
+          loginSubmitBtn.disabled = false;
+          loginSubmitBtn.textContent = "Log In";
+        }
+      });
+
+      // SIGNUP — Step 1: name, phone, password
+      const signupErrorStep1 = document.getElementById("signupErrorStep1");
+      const signupErrorStep2 = document.getElementById("signupErrorStep2");
+      const toStep2Btn = document.getElementById("toStep2Btn");
+      const backToStep1Btn = document.getElementById("backToStep1Btn");
+      const confirmBox = document.getElementById("confirmBox");
+      const confirmName = document.getElementById("confirmName");
+      const waBtn = document.getElementById("waBtn");
+      const signupSubmitBtn = document.getElementById("signupSubmitBtn");
+
+      toStep2Btn.addEventListener("click", () => {
+        const name = document.getElementById("nameInput").value.trim();
+        const phone = document.getElementById("phoneInput").value.trim();
+        const password = document.getElementById("signupPassword").value;
+
+        if (!name || !phone || !password) {
+          signupErrorStep1.textContent = "Please fill in all fields.";
+          signupErrorStep1.classList.add("show");
+          return;
+        }
+        if (password.length < 6) {
+          signupErrorStep1.textContent =
+            "Password must be at least 6 characters.";
+          signupErrorStep1.classList.add("show");
+          return;
+        }
+
+        signupErrorStep1.classList.remove("show");
+        goToStep(2);
+      });
+
+      backToStep1Btn.addEventListener("click", () => {
+        signupErrorStep2.classList.remove("show");
+        goToStep(1);
+      });
+
+      // SIGNUP — Step 2: aadhar + email, then submit everything
+      signupForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const name = document.getElementById("nameInput").value.trim();
+        const phone = document.getElementById("phoneInput").value.trim();
+        const password = document.getElementById("signupPassword").value;
+        const aadhar = document.getElementById("aadharInput").value.trim();
+        const email = document.getElementById("emailInput").value.trim();
+
+        if (!aadhar || !email) {
+          signupErrorStep2.textContent = "Please fill in all fields.";
+          signupErrorStep2.classList.add("show");
+          return;
+        }
+
+        const aadharDigits = aadhar.replace(/\D/g, "");
+        if (aadharDigits.length !== 12) {
+          signupErrorStep2.textContent =
+            "Aadhar number must be exactly 12 digits.";
+          signupErrorStep2.classList.add("show");
+          return;
+        }
+
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          signupErrorStep2.textContent = "Enter a valid email address.";
+          signupErrorStep2.classList.add("show");
+          return;
+        }
+
+        signupErrorStep2.classList.remove("show");
+        signupSubmitBtn.disabled = true;
+        signupSubmitBtn.textContent = "Joining…";
+
+        try {
+          const res = await fetch(SIGNUP_API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name,
+              phone,
+              password,
+              aadhar: aadharDigits,
+              email,
+            }),
+          });
+
+          if (!res.ok) throw new Error("Server error");
+
+          confirmName.textContent = name;
+          tabs.classList.add("hide");
+          cardTitle.style.display = "none";
+          signupForm.classList.add("hide");
+          confirmBox.classList.add("show");
+
+          const waMessage = encodeURIComponent(
+            `Hi! I just registered for KGSC 🎉\n\n` +
+              `*Name:* ${name}\n` +
+              `*Phone:* ${phone}\n` +
+              `*Email:* ${email}`,
+          );
+          waBtn.href = `https://wa.me/${CLUB_WHATSAPP_NUMBER}?text=${waMessage}`;
+        } catch (err) {
+          signupErrorStep2.textContent =
+            "Something went wrong. Please try again.";
+          signupErrorStep2.classList.add("show");
+          signupSubmitBtn.disabled = false;
+          signupSubmitBtn.textContent = "Join the group";
+        }
+      });
+
+      // Google OAuth — point these at your backend's Google flow, or wire to @react-oauth/google
+      document
+        .getElementById("googleLoginBtn")
+        .addEventListener("click", () => {
+          window.location.href =
+            "https://kgsc-server.onrender.com/api/auth/google";
+        });
+      document
+        .getElementById("googleSignupBtn")
+        .addEventListener("click", () => {
+          window.location.href =
+            "https://kgsc-server.onrender.com/api/auth/google";
+        });
+    </script>
+  </body>
+</html>
