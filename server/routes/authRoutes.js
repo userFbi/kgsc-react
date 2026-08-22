@@ -9,6 +9,8 @@ const {
   getMe,
   completeProfile,
   updateProfile,
+  sendOtp,
+  verifyOtp,
 } = require("../controllers/authController");
 
 router.post("/signup", signup);
@@ -22,5 +24,7 @@ router.patch(
   completeProfile,
 );
 router.patch("/profile", verifyToken, upload.single("photo"), updateProfile);
+router.post("/send-otp", sendOtp);
+router.post("/verify-otp", verifyOtp);
 
 module.exports = router;

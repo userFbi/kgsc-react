@@ -20,7 +20,7 @@ function useYearsRunning() {
     now.getMonth() > foundingDate.getMonth() ||
     (now.getMonth() === foundingDate.getMonth() && now.getDate() >= foundingDate.getDate());
   if (!hadAnniversary) years -= 1;
-  return `${years}+`;
+  return `${years +1}`;
 }
 
 export default function Home() {
@@ -226,13 +226,8 @@ export default function Home() {
               </figure>
             ))}
           </div>
-          <p className="gallery-note">
-            Drop your own photos into an /images folder as 1.jpg – 6.jpg and
-            they'll appear here automatically.
-          </p>
         </div>
       </section>
-
       <Footer />
     </div>
   );

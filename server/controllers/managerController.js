@@ -1,7 +1,7 @@
 const User = require("../models/User");
 const Member = require("../models/Member");
+const getNextMembershipId = require("../utils/getNextMembershipId");
 
-// POST /api/manager/members
 exports.addMember = async (req, res) => {
   try {
     const { name, phone, aadhar, address, tshirtSize, shortsSize } = req.body;
@@ -10,6 +10,8 @@ exports.addMember = async (req, res) => {
       return res.status(400).json({ error: "All fields are required." });
     }
 
+    const membershipId = await getNextMembershipId();   // 👈 ye line add karein
+
     const member = await Member.create({
       name,
       phone,
@@ -17,6 +19,7 @@ exports.addMember = async (req, res) => {
       address,
       tshirtSize,
       shortsSize,
+      membershipId,
       addedBy: req.userId,
     });
 
@@ -30,7 +33,26 @@ exports.addMember = async (req, res) => {
 // GET /api/manager/members
 exports.getMembers = async (req, res) => {
   try {
-    const members = await Member.find().sort({ joined: -1 });
+    const members = await Member.aggregate([
+      {
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      {
+        $addFields: {
+          membershipId: {
+            $ifNull: ["$membershipId", { $arrayElemAt: ["$user.membershipId", 0] }],
+          },
+        },
+      },
+      { $project: { user: 0 } },
+      { $sort: { joined: -1 } },
+    ]);
+
     res.status(200).json({ data: members });
   } catch (error) {
     console.error("Get members error:", error);

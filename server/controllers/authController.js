@@ -2,6 +2,9 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const Member = require("../models/Member");
+const Otp = require("../models/Otp");
+const sendEmail = require("../config/brevo");
+
 
 // GET /api/auth/me
 exports.getMe = async (req, res) => {
@@ -50,9 +53,12 @@ exports.signup = async (req, res) => {
       return res.status(400).json({ error: "All fields are required." });
     }
 
-    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    const existingUser = await User.findOne({
+      $or: [{ email: email.toLowerCase() }, { phone: phone.trim() }],
+    });
     if (existingUser) {
-      return res.status(400).json({ error: "Email already registered." });
+      const field = existingUser.email === email.toLowerCase() ? "email" : "phone number";
+      return res.status(400).json({ error: `An account with this ${field} already exists.` });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -87,22 +93,35 @@ exports.signup = async (req, res) => {
 // POST /api/auth/login
 exports.login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { identifier, password } = req.body;
 
-    if (!email || !password) {
+    if (!identifier || !password) {
       return res
         .status(400)
-        .json({ error: "Email and password are required." });
+        .json({ error: "Phone number or Member ID and password are required." });
     }
 
-    const user = await User.findOne({ email: email.toLowerCase() });
+    const trimmedIdentifier = identifier.trim();
+
+    // Match against phone number OR membership ID (case-insensitive for the ID)
+    const user = await User.findOne({
+      $or: [
+        { phone: trimmedIdentifier },
+        { membershipId: trimmedIdentifier.toUpperCase() },
+      ],
+    });
+
     if (!user || !user.password) {
-      return res.status(400).json({ error: "Invalid email or password." });
+      return res
+        .status(400)
+        .json({ error: "Invalid phone number/Member ID or password." });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ error: "Invalid email or password." });
+      return res
+        .status(400)
+        .json({ error: "Invalid phone number/Member ID or password." });
     }
 
     const token = generateToken(user._id);
@@ -201,5 +220,62 @@ exports.completeProfile = async (req, res) => {
   } catch (error) {
     console.error("Complete profile error:", error);
     res.status(500).json({ error: "Something went wrong. Try again." });
+  }
+};
+
+// POST /api/auth/send-otp
+exports.sendOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({ message: "Enter a valid email address." });
+    }
+
+    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+
+    await Otp.deleteMany({ email });
+    await Otp.create({ email, otp: otpCode, expiresAt });
+
+    await sendEmail(
+      email,
+      "Your KGSC verification code",
+      `<p>Your OTP is <b>${otpCode}</b>. It is valid for 5 minutes.</p>`
+    );
+
+    res.status(200).json({ message: "OTP sent to your email." });
+  } catch (error) {
+    console.error("Send OTP error:", error);
+    res.status(500).json({ message: "Unable to send OTP." });
+  }
+};
+
+// POST /api/auth/verify-otp
+exports.verifyOtp = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+      return res.status(400).json({ message: "Email and OTP are required." });
+    }
+
+    const record = await Otp.findOne({ email, otp });
+
+    if (!record) {
+      return res.status(400).json({ message: "Invalid OTP." });
+    }
+
+    if (record.expiresAt < new Date()) {
+      await Otp.deleteOne({ _id: record._id });
+      return res.status(400).json({ message: "OTP expired. Please request a new one." });
+    }
+
+    await Otp.deleteOne({ _id: record._id });
+
+    res.status(200).json({ message: "Email verified." });
+  } catch (error) {
+    console.error("Verify OTP error:", error);
+    res.status(500).json({ message: "Something went wrong." });
   }
 };

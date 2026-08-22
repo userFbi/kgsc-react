@@ -54,7 +54,8 @@ export default function ViewMembers() {
       (m) =>
         m.name.toLowerCase().includes(q) ||
         m.phone.includes(q) ||
-        m.address.toLowerCase().includes(q),
+        m.address.toLowerCase().includes(q) ||
+        (m.membershipId || "").toLowerCase().includes(q),
     );
   }, [members, query]);
 
@@ -168,7 +169,7 @@ export default function ViewMembers() {
             <i className="bi bi-search"></i>
             <input
               type="text"
-              placeholder="Search by name, phone, or address"
+              placeholder="Search by name, phone, address, or membership ID"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
@@ -195,7 +196,7 @@ export default function ViewMembers() {
                   </tr>
                 </thead>
                 <tbody>
-                  {paginated.map((m,index) => (
+                  {paginated.map((m, index) => (
                     <tr key={m._id}>
                       <td>{index + 1}.</td>
                       <td>
@@ -299,7 +300,9 @@ export default function ViewMembers() {
           {viewingMember && (
             <>
               <h2 className="mgr-modal-title">{viewingMember.name}</h2>
-              <p className="mgr-modal-sub">{viewingMember.phone}</p>
+              <p className="mgr-modal-sub">
+                {viewingMember.membershipId || "—"}
+              </p>
 
               <div className="detail-grid">
                 <div className="detail-item">
@@ -383,7 +386,9 @@ export default function ViewMembers() {
           {editingMember && editForm && (
             <>
               <h2 className="mgr-modal-title">Edit member</h2>
-              <p className="mgr-modal-sub">{editingMember.phone}</p>
+              <p className="mgr-modal-sub">
+                {editingMember.membershipId || "—"}
+              </p>
 
               <form
                 className="manager-form"

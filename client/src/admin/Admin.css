@@ -169,13 +169,13 @@
 .btn-text {
   background: transparent;
   color: rgba(17, 18, 13, 0.55);
-  border: none;
-  padding: 12px 8px;
+  border: 1px solid var(--line);
 }
 
 .btn-text:hover {
   color: var(--ink);
-  text-decoration: underline;
+  border-color: var(--marigold-500);
+  background: var(--cream-100);
 }
 
 .admin-form-actions {
@@ -782,6 +782,64 @@
   padding: 14px;
 }
 
-.recent-list{
+.recent-list {
   font-family: var(--font-display) !important;
+}
+
+/* ============================= YEARLY BALANCE CHART ============================= */
+.yearly-chart-panel {
+  margin-bottom: 28px;
+}
+
+.yearly-chart-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0;
+}
+
+.yearly-chart-wrap {
+  position: relative;
+  height: 320px;
+}
+
+@media (min-width: 700px) {
+  .yearly-chart-wrap {
+    height: 360px;
+  }
+}
+
+/* ============================= YEAR LOOKUP ============================= */
+.year-lookup-panel {
+  margin-bottom: 28px;
+}
+
+.year-lookup-select {
+  padding: 10px 36px 10px 16px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  min-height: 42px;
+  font-family: var(--font-body);
+  background: var(--cream-100);
+  color: var(--ink);
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23565449' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  transition: border 0.2s ease;
+}
+
+.year-lookup-select:focus {
+  border-color: var(--marigold-500);
+}
+
+.year-lookup-select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }

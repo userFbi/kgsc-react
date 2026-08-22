@@ -5,19 +5,21 @@ const nomineeSchema = new mongoose.Schema(
     name: { type: String, trim: true },
     relation: { type: String, trim: true },
     phone: { type: String, trim: true },
+
   },
   { _id: false }
 );
 
 const memberSchema = new mongoose.Schema(
   {
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null }, // 👈 naya link
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
+    membershipId: { type: String, unique: true, sparse: true },
     name: { type: String, required: true, trim: true },
     phone: { type: String, required: true, trim: true },
-    aadhar: { type: String, default: null, trim: true },       // ab optional
-    address: { type: String, default: null, trim: true },       // ab optional
-    tshirtSize: { type: String, default: null },                // ab optional
-    shortsSize: { type: String, default: null },                // ab optional
+    aadhar: { type: String, default: null, trim: true },
+    address: { type: String, default: null, trim: true },
+    tshirtSize: { type: String, default: null },
+    shortsSize: { type: String, default: null },
     joined: { type: Date, default: Date.now },
     insurance: { type: Boolean, default: false },
     nominee: { type: nomineeSchema, default: null },

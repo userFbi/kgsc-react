@@ -133,7 +133,7 @@ export default function Dashboard() {
           <div className="stat-icon">
             <i className="bi bi-calendar-event-fill"></i>
           </div>
-          <div className="stat-num">{getYearsRunning()}+</div>
+          <div className="stat-num">{getYearsRunning() + 1}</div>
           <div className="stat-label">Years running</div>
         </div>
       </div>
