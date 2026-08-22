@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./CompleteProfile.css";
 
-const API_URL = "http://localhost:5050/api/auth";
+const API_URL = `${import.meta.env.VITE_API_URL}/api/auth`;
 const STEPS = ["Photo", "Aadhar", "Address", "Sizes"];
 const SIZES = ["S", "M", "L", "XL", "XXL", "3XL", "4XL", "5XL"];
 

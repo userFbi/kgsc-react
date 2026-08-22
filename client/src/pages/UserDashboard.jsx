@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import "./UserDashboard.css";
 import { api } from "../lib/api.js";
 
-const API_URL = "http://localhost:5050/api/auth";
+const API_URL = `${import.meta.env.VITE_API_URL}/api/auth`;
 
 export default function UserDashboard() {
   const navigate = useNavigate();

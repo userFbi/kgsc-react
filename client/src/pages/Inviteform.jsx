@@ -2,7 +2,7 @@ import { useState } from "react";
 import "./InviteForm.css";
 
 const API_URL = "https://kgsc-server.onrender.com/api/submit";
-const CLUB_WHATSAPP_NUMBER = "9725720612"; // 👈 replace with your KGSC WhatsApp number (country code + number, no + or spaces)
+const CLUB_WHATSAPP_NUMBER = "9725720612"; // 
 
 export default function InviteForm() {
     const [form, setForm] = useState({ name: "", age: "", phone: "", address: "" });

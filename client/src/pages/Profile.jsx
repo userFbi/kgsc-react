@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Profile.css";
 
-const API_URL = "http://localhost:5050/api/auth";
+const API_URL = `${import.meta.env.VITE_API_URL}/api/auth`;
 const SIZES = ["S", "M", "L", "XL", "XXL", "3XL", "4XL", "5XL"];
 
 export default function Profile() {
