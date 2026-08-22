@@ -485,3 +485,33 @@
     height: 44px;
   }
 }
+
+.field-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.forgot-link {
+  background: none;
+  border: none;
+  color: var(--marigold-600);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.forgot-link:hover {
+  text-decoration: underline;
+}
+
+.auth-success {
+  background: rgba(63, 145, 66, 0.1);
+  border: 1px solid rgba(63, 145, 66, 0.3);
+  color: #2f7a34;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm, 10px);
+  font-size: 0.85rem;
+  margin-bottom: 4px;
+}

@@ -37,28 +37,26 @@ function sanitizeUser(user) {
     isProfileComplete: user.isProfileComplete,
     address: user.address,
     aadharNumber: user.aadharNumber,
-    tshirtSize: user.tshirtSize,      // 👈 naya
-    shortsSize: user.shortsSize,      // 👈 naya
+    tshirtSize: user.tshirtSize,
+    shortsSize: user.shortsSize,
+    createdAt: user.createdAt,
   };
 }
 
-// POST /api/auth/signup
 
+// POST /api/auth/signup
 // POST /api/auth/signup
 exports.signup = async (req, res) => {
   try {
-    const { fullName, email, phone, password } = req.body;
+    const { fullName, email, phone, password, aadhar } = req.body;
 
     if (!fullName || !email || !phone || !password) {
       return res.status(400).json({ error: "All fields are required." });
     }
 
-    const existingUser = await User.findOne({
-      $or: [{ email: email.toLowerCase() }, { phone: phone.trim() }],
-    });
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
     if (existingUser) {
-      const field = existingUser.email === email.toLowerCase() ? "email" : "phone number";
-      return res.status(400).json({ error: `An account with this ${field} already exists.` });
+      return res.status(400).json({ error: "Email already registered." });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -72,13 +70,14 @@ exports.signup = async (req, res) => {
       phone,
       password: hashedPassword,
       membershipId,
+      aadharNumber: aadhar || null,
     });
 
-    // 👇 Manager roster me bhi add karo
     await Member.create({
       userId: user._id,
       name: fullName,
       phone,
+      aadhar: aadhar || null,
     });
 
     const token = generateToken(user._id);
@@ -276,6 +275,77 @@ exports.verifyOtp = async (req, res) => {
     res.status(200).json({ message: "Email verified." });
   } catch (error) {
     console.error("Verify OTP error:", error);
+    res.status(500).json({ message: "Something went wrong." });
+  }
+};
+
+// POST /api/auth/forgot-password/send-otp
+exports.sendPasswordResetOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({ message: "Enter a valid email address." });
+    }
+
+    const user = await User.findOne({ email: email.toLowerCase() });
+    if (!user) {
+      return res.status(404).json({ message: "No account found with this email." });
+    }
+
+    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+
+    await Otp.deleteMany({ email: email.toLowerCase() });
+    await Otp.create({ email: email.toLowerCase(), otp: otpCode, expiresAt });
+
+    await sendEmail(
+      email,
+      "Reset your KGSC password",
+      `<p>Your password reset code is <b>${otpCode}</b>. It is valid for 5 minutes.</p>`
+    );
+
+    res.status(200).json({ message: "OTP sent to your email." });
+  } catch (error) {
+    console.error("Send password reset OTP error:", error);
+    res.status(500).json({ message: "Unable to send OTP." });
+  }
+};
+
+// POST /api/auth/forgot-password/reset
+exports.resetPassword = async (req, res) => {
+  try {
+    const { email, otp, newPassword } = req.body;
+
+    if (!email || !otp || !newPassword) {
+      return res.status(400).json({ message: "All fields are required." });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: "Password must be at least 6 characters." });
+    }
+
+    const record = await Otp.findOne({ email: email.toLowerCase(), otp });
+    if (!record) {
+      return res.status(400).json({ message: "Invalid OTP." });
+    }
+
+    if (record.expiresAt < new Date()) {
+      await Otp.deleteOne({ _id: record._id });
+      return res.status(400).json({ message: "OTP expired. Please request a new one." });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await User.findOneAndUpdate(
+      { email: email.toLowerCase() },
+      { password: hashedPassword }
+    );
+
+    await Otp.deleteOne({ _id: record._id });
+
+    res.status(200).json({ message: "Password reset successfully." });
+  } catch (error) {
+    console.error("Reset password error:", error);
     res.status(500).json({ message: "Something went wrong." });
   }
 };

@@ -76,17 +76,39 @@ export default function UserDashboard() {
   }
 
   function getYearsWithClub() {
-    if (!user) return "—";
+    if (!user?.createdAt) return 1;
+    const joined = new Date(user.createdAt);
+    const now = new Date();
+    let years = now.getFullYear() - joined.getFullYear();
+    const hasHadAnniversary =
+      now.getMonth() > joined.getMonth() ||
+      (now.getMonth() === joined.getMonth() &&
+        now.getDate() >= joined.getDate());
+    if (!hasHadAnniversary) years -= 1;
+    return Math.max(1, years + 1);
+  }
 
-    if (user.yearsWithClub != null) {
-      return user.yearsWithClub;
-    }
+  function getOrdinalSuffix(num) {
+    const j = num % 10;
+    const k = num % 100;
+    if (j === 1 && k !== 11) return "st";
+    if (j === 2 && k !== 12) return "nd";
+    if (j === 3 && k !== 13) return "rd";
+    return "th";
+  }
 
-    if (user.memberSince) {
-      return Math.max(0, new Date().getFullYear() - Number(user.memberSince));
-    }
+  function getYearsWithClubLabel() {
+    const years = getYearsWithClub();
+    return `${years}${getOrdinalSuffix(years)} Year`;
+  }
 
-    return "—";
+  function getMemberSinceLabel() {
+    if (!user?.createdAt) return "—";
+    return new Date(user.createdAt).toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
   }
 
   function handleViewMembership() {
@@ -182,10 +204,7 @@ export default function UserDashboard() {
               </div>
 
               <div className="ud-membership-label">Member Since</div>
-
-              <div className="ud-membership-value">
-                {user.memberSince || "—"}
-              </div>
+              <div className="ud-membership-value">{getMemberSinceLabel()}</div>
             </div>
 
             {/* Years With Club */}
@@ -197,14 +216,7 @@ export default function UserDashboard() {
               <div className="ud-membership-label">Years With Club</div>
 
               <div className="ud-membership-value">
-                {user.yearsWithClub != null
-                  ? `${user.yearsWithClub} Years`
-                  : user.memberSince
-                    ? `${Math.max(
-                        0,
-                        new Date().getFullYear() - Number(user.memberSince),
-                      )} Years`
-                    : "—"}
+                {getYearsWithClubLabel()}
               </div>
             </div>
           </div>

@@ -8,6 +8,8 @@ const API_URL = `${import.meta.env.VITE_API_URL}/api/auth`;
 const SEND_OTP_API_URL = `${API_URL}/send-otp`;
 const VERIFY_OTP_API_URL = `${API_URL}/verify-otp`;
 const SIGNUP_API_URL = `${API_URL}/signup`;
+const FORGOT_SEND_OTP_URL = `${API_URL}/forgot-password/send-otp`;
+const FORGOT_RESET_URL = `${API_URL}/forgot-password/reset`;
 
 export default function Login() {
   const navigate = useNavigate();
@@ -33,11 +35,21 @@ export default function Login() {
   const [signupErrors, setSignupErrors] = useState({});
   const [showSignupPass, setShowSignupPass] = useState(false);
 
-  // OTP
+  // OTP (signup)
   const [otpValue, setOtpValue] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [otpLoading, setOtpLoading] = useState(false);
   const [otpVerified, setOtpVerified] = useState(false);
+
+  // FORGOT PASSWORD
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotOtpSent, setForgotOtpSent] = useState(false);
+  const [forgotOtp, setForgotOtp] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [showNewPass, setShowNewPass] = useState(false);
+  const [forgotErrors, setForgotErrors] = useState({});
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotSuccess, setForgotSuccess] = useState("");
 
   function saveSessionAndRedirect(data) {
     if (data.token) localStorage.setItem("token", data.token);
@@ -52,11 +64,19 @@ export default function Login() {
     setApiError("");
     setSignupErrors({});
     setLoginErrors({});
+    setForgotErrors({});
+    setForgotSuccess("");
     if (selectedTab === "signup") {
       setSignupStep(1);
       setOtpSent(false);
       setOtpVerified(false);
       setOtpValue("");
+    }
+    if (selectedTab === "forgot") {
+      setForgotEmail("");
+      setForgotOtpSent(false);
+      setForgotOtp("");
+      setNewPassword("");
     }
   }
 
@@ -254,6 +274,76 @@ export default function Login() {
     }
   }
 
+  // FORGOT PASSWORD HANDLERS
+  async function sendForgotOtp() {
+    setForgotErrors({});
+    setForgotSuccess("");
+    const email = forgotEmail.trim();
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setForgotErrors({ email: "Enter a valid email address." });
+      return;
+    }
+
+    setForgotLoading(true);
+    try {
+      const res = await fetch(FORGOT_SEND_OTP_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Unable to send OTP.");
+      setForgotOtpSent(true);
+      setForgotSuccess(data.message || "OTP sent to your email.");
+    } catch (error) {
+      setForgotErrors({ form: error.message || "Unable to send OTP." });
+    } finally {
+      setForgotLoading(false);
+    }
+  }
+
+  async function handleResetPassword(e) {
+    e.preventDefault();
+    setForgotErrors({});
+    setForgotSuccess("");
+
+    const errors = {};
+    if (forgotOtp.length !== 6) errors.otp = "Enter the 6-digit OTP.";
+    if (newPassword.length < 6)
+      errors.newPassword = "Password must be at least 6 characters.";
+    setForgotErrors(errors);
+    if (Object.keys(errors).length > 0) return;
+
+    setForgotLoading(true);
+    try {
+      const res = await fetch(FORGOT_RESET_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: forgotEmail.trim(),
+          otp: forgotOtp,
+          newPassword,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Unable to reset password.");
+
+      setForgotSuccess("Password reset successfully. You can log in now.");
+      setForgotOtp("");
+      setNewPassword("");
+      setForgotOtpSent(false);
+
+      setTimeout(() => {
+        changeTab("login");
+      }, 1500);
+    } catch (error) {
+      setForgotErrors({ form: error.message || "Unable to reset password." });
+    } finally {
+      setForgotLoading(false);
+    }
+  }
+
   return (
     <div className="page-shell login-shell">
       <div className="bg-rings" aria-hidden="true">
@@ -308,32 +398,38 @@ export default function Login() {
         </div>
 
         <div className="auth-card">
-          <div className="auth-tabs">
-            <button
-              type="button"
-              className={`auth-tab ${tab === "login" ? "is-active" : ""}`}
-              onClick={() => changeTab("login")}
-            >
-              Login
-            </button>
-            <button
-              type="button"
-              className={`auth-tab ${tab === "signup" ? "is-active" : ""}`}
-              onClick={() => changeTab("signup")}
-            >
-              Sign Up
-            </button>
-          </div>
+          {tab !== "forgot" && (
+            <div className="auth-tabs">
+              <button
+                type="button"
+                className={`auth-tab ${tab === "login" ? "is-active" : ""}`}
+                onClick={() => changeTab("login")}
+              >
+                Login
+              </button>
+              <button
+                type="button"
+                className={`auth-tab ${tab === "signup" ? "is-active" : ""}`}
+                onClick={() => changeTab("signup")}
+              >
+                Sign Up
+              </button>
+            </div>
+          )}
 
           <h2 className="auth-card-title">
             {tab === "login"
               ? "Log in to your account"
-              : signupStep === 1
-                ? "Verify your email"
-                : "Enter your details"}
+              : tab === "forgot"
+                ? "Reset your password"
+                : signupStep === 1
+                  ? "Verify your email"
+                  : "Enter your details"}
           </h2>
 
-          {apiError && <p className="auth-api-error">{apiError}</p>}
+          {tab !== "forgot" && apiError && (
+            <p className="auth-api-error">{apiError}</p>
+          )}
 
           {tab === "login" && (
             <form
@@ -360,7 +456,16 @@ export default function Login() {
               </div>
 
               <div className="field">
-                <label htmlFor="loginPassword">Password</label>
+                <div className="field-label-row">
+                  <label htmlFor="loginPassword">Password</label>
+                  <button
+                    type="button"
+                    className="forgot-link"
+                    onClick={() => changeTab("forgot")}
+                  >
+                    Forgot password?
+                  </button>
+                </div>
                 <div className="field-wrap">
                   <input
                     id="loginPassword"
@@ -480,7 +585,6 @@ export default function Login() {
                   <div className="divider">
                     <span>or</span>
                   </div>
-                 
                 </div>
               )}
 
@@ -592,23 +696,136 @@ export default function Login() {
             </form>
           )}
 
-          <p className="auth-switch">
-            {tab === "login" ? (
-              <>
-                New here?{" "}
-                <button type="button" onClick={() => changeTab("signup")}>
-                  Create an account
-                </button>
-              </>
-            ) : (
-              <>
-                Already have an account?{" "}
+          {tab === "forgot" && (
+            <form
+              className="auth-panel is-active"
+              onSubmit={handleResetPassword}
+              autoComplete="off"
+            >
+              {forgotErrors.form && (
+                <p className="auth-api-error">{forgotErrors.form}</p>
+              )}
+              {forgotSuccess && <p className="auth-success">{forgotSuccess}</p>}
+
+              <div className="field">
+                <label htmlFor="forgotEmail">Email address</label>
+                <div className="otp-inline-row">
+                  <input
+                    id="forgotEmail"
+                    type="email"
+                    placeholder="e.g. you@email.com"
+                    autoComplete="email"
+                    value={forgotEmail}
+                    onChange={(e) => setForgotEmail(e.target.value)}
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="btn-next otp-inline-btn"
+                    onClick={sendForgotOtp}
+                    disabled={forgotLoading}
+                  >
+                    {forgotLoading && !forgotOtpSent
+                      ? "Sending..."
+                      : forgotOtpSent
+                        ? "Resend OTP"
+                        : "Send OTP"}
+                  </button>
+                </div>
+                <span className="field-error">{forgotErrors.email}</span>
+              </div>
+
+              {forgotOtpSent && (
+                <>
+                  <div className="field">
+                    <label htmlFor="forgotOtp">Enter OTP</label>
+                    <input
+                      id="forgotOtp"
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={6}
+                      placeholder="6-digit OTP"
+                      value={forgotOtp}
+                      onChange={(e) =>
+                        setForgotOtp(
+                          e.target.value.replace(/\D/g, "").slice(0, 6),
+                        )
+                      }
+                      required
+                    />
+                    <span className="field-error">{forgotErrors.otp}</span>
+                  </div>
+
+                  <div className="field">
+                    <label htmlFor="newPassword">New password</label>
+                    <div className="field-wrap">
+                      <input
+                        id="newPassword"
+                        type={showNewPass ? "text" : "password"}
+                        placeholder="Create a new password"
+                        autoComplete="new-password"
+                        minLength={6}
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        required
+                      />
+                      <button
+                        type="button"
+                        className="toggle-pw"
+                        onClick={() => setShowNewPass((v) => !v)}
+                        tabIndex={-1}
+                        aria-label={
+                          showNewPass ? "Hide password" : "Show password"
+                        }
+                      >
+                        <i
+                          className={`bi ${showNewPass ? "bi-eye-slash" : "bi-eye"}`}
+                        ></i>
+                      </button>
+                    </div>
+                    <span className="field-error">
+                      {forgotErrors.newPassword}
+                    </span>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="btn-primary"
+                    disabled={forgotLoading}
+                  >
+                    {forgotLoading ? "Resetting..." : "Reset password"}
+                  </button>
+                </>
+              )}
+
+              <p className="auth-switch">
+                Remembered your password?{" "}
                 <button type="button" onClick={() => changeTab("login")}>
                   Log in instead
                 </button>
-              </>
-            )}
-          </p>
+              </p>
+            </form>
+          )}
+
+          {tab !== "forgot" && (
+            <p className="auth-switch">
+              {tab === "login" ? (
+                <>
+                  New here?{" "}
+                  <button type="button" onClick={() => changeTab("signup")}>
+                    Create an account
+                  </button>
+                </>
+              ) : (
+                <>
+                  Already have an account?{" "}
+                  <button type="button" onClick={() => changeTab("login")}>
+                    Log in instead
+                  </button>
+                </>
+              )}
+            </p>
+          )}
         </div>
 
         <footer className="login-footer">

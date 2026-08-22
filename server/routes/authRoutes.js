@@ -11,6 +11,8 @@ const {
   updateProfile,
   sendOtp,
   verifyOtp,
+  sendPasswordResetOtp,
+  resetPassword,
 } = require("../controllers/authController");
 
 router.post("/signup", signup);
@@ -26,5 +28,7 @@ router.patch(
 router.patch("/profile", verifyToken, upload.single("photo"), updateProfile);
 router.post("/send-otp", sendOtp);
 router.post("/verify-otp", verifyOtp);
+router.post("/forgot-password/send-otp", sendPasswordResetOtp);
+router.post("/forgot-password/reset", resetPassword);
 
 module.exports = router;
