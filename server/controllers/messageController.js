@@ -1,4 +1,6 @@
 const Message = require("../models/Message");
+const PushSubscription = require("../models/PushSubscription");  
+const webpush = require("../config/webpush");                    
 
 // GET /api/messages
 exports.getMessages = async (req, res) => {
@@ -10,6 +12,7 @@ exports.getMessages = async (req, res) => {
     res.status(500).json({ error: "Something went wrong." });
   }
 };
+
 // POST /api/messages
 exports.createMessage = async (req, res) => {
   try {
@@ -24,6 +27,26 @@ exports.createMessage = async (req, res) => {
       senderName: req.userFullName,
       senderRole: req.userRole,
     });
+
+    // 👇 Push notification saare subscribers ko bhejo
+    const subscriptions = await PushSubscription.find();
+    const payload = JSON.stringify({
+      title: title?.trim() || "New announcement",
+      body: message.trim(),
+    });
+
+    await Promise.allSettled(
+      subscriptions.map((sub) =>
+        webpush
+          .sendNotification({ endpoint: sub.endpoint, keys: sub.keys }, payload)
+          .catch(async (err) => {
+            // Agar subscription expire/invalid ho gayi ho, use delete kar do
+            if (err.statusCode === 410 || err.statusCode === 404) {
+              await PushSubscription.findByIdAndDelete(sub._id);
+            }
+          }),
+      ),
+    );
 
     res.status(201).json(newMessage);
   } catch (error) {

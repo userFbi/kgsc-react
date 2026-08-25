@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "./UserDashboard.css";
+import { subscribeToPush } from "../lib/pushNotifications.js";
 import { api } from "../lib/api.js";
+import "./UserDashboard.css";
 
 const API_URL = `${import.meta.env.VITE_API_URL}/api/auth`;
 
@@ -12,6 +13,21 @@ export default function UserDashboard() {
   const [loading, setLoading] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
   const [messages, setMessages] = useState([]);
+  const [showNotifyBanner, setShowNotifyBanner] = useState(false);
+
+  useEffect(() => {
+    const supported = "Notification" in window;
+    if (supported && Notification.permission === "default") {
+      setShowNotifyBanner(true);
+    }
+  }, []);
+
+  async function handleEnableNotifications() {
+    const success = await subscribeToPush();
+    if (success) {
+      setShowNotifyBanner(false);
+    }
+  }
 
   useEffect(() => {
     api
@@ -75,6 +91,13 @@ export default function UserDashboard() {
     return name?.trim()?.split(" ")[0] || "Member";
   }
 
+  function getGreeting() {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good morning";
+    if (hour < 17) return "Good afternoon";
+    return "Good evening";
+  }
+
   function getYearsWithClub() {
     if (!user?.createdAt) return 1;
     const joined = new Date(user.createdAt);
@@ -99,22 +122,15 @@ export default function UserDashboard() {
 
   function getYearsWithClubLabel() {
     const years = getYearsWithClub();
-    return `${years}${getOrdinalSuffix(years)} Year`;
+    return `${years}${getOrdinalSuffix(years)}`;
   }
 
-  function getMemberSinceLabel() {
+  function getJoiningDateLabel() {
     if (!user?.createdAt) return "—";
     return new Date(user.createdAt).toLocaleDateString("en-IN", {
       day: "2-digit",
       month: "short",
       year: "numeric",
-    });
-  }
-
-  function handleViewMembership() {
-    document.querySelector(".ud-membership-card")?.scrollIntoView({
-      behavior: "smooth",
-      block: "center",
     });
   }
 
@@ -137,189 +153,118 @@ export default function UserDashboard() {
 
   return (
     <div className="ud-page">
-      <div className="ud-field-lines" />
-
       <main className="ud-wrap">
         {/* Header */}
         <header className="ud-dash-header">
           <button
-            className="ud-menu-btn"
+            className="ud-icon-btn"
             onClick={() => setMenuOpen(true)}
             aria-label="Open menu"
           >
             <i className="bi bi-list" />
           </button>
 
-          <div className="ud-eyebrow">
-            <span className="ud-eyebrow-dot" />
-            MEMBER DASHBOARD
-          </div>
-
-          <h1>
-            Welcome back, <span>{getFirstName(user.fullName)}</span>
-          </h1>
-
-          <p className="ud-lede">Here's your membership at a glance.</p>
+          <button
+            className="ud-icon-btn"
+            onClick={handleEnableNotifications}
+            aria-label="Notifications"
+          >
+            <i className="bi bi-bell" />
+          </button>
         </header>
 
-        {/* Membership Overview */}
-        <section className="ud-membership-card">
-          <h3 className="ud-section-title">Membership overview</h3>
+        <p className="ud-greeting-eyebrow">{getGreeting()}</p>
+        <h1 className="ud-greeting-name">{getFirstName(user.fullName)}</h1>
 
-          <div className="ud-membership-grid">
-            {/* Membership ID */}
-            <div className="ud-membership-stat">
-              <div className="ud-membership-icon">
-                <i className="bi bi-person-vcard-fill" />
-              </div>
+        {/* Membership Card */}
+        <section className="ud-id-card">
+          <p className="ud-id-label">Membership ID</p>
+          <p className="ud-id-value">{user.membershipId || "Pending"}</p>
 
-              <div className="ud-membership-label">Membership ID</div>
-
-              <div className="ud-membership-value">
-                {user.membershipId || "Pending"}
-              </div>
+          <div className="ud-id-stats">
+            <div className="ud-id-stat">
+              <p className="ud-id-stat-value">{getYearsWithClubLabel()}</p>
+              <p className="ud-id-stat-label">year</p>
             </div>
-
-            {/* Insurance */}
-            <div className="ud-membership-stat">
-              <div className="ud-membership-icon">
-                <i className="bi bi-shield-check" />
-              </div>
-
-              <div className="ud-membership-label">Insurance</div>
-
-              <div className="ud-membership-value">
-                {user.isInsured === true ||
-                user.insured === true ||
-                user.insurance?.insured === true
-                  ? "Active"
-                  : "Not Insured"}
-              </div>
+            <div className="ud-id-stat">
+              <p className="ud-id-stat-value">
+                {isInsured ? "Active" : "None"}
+              </p>
+              <p className="ud-id-stat-label">insurance</p>
             </div>
-
-            {/* Member Since */}
-            <div className="ud-membership-stat">
-              <div className="ud-membership-icon">
-                <i className="bi bi-calendar3" />
-              </div>
-
-              <div className="ud-membership-label">Member Since</div>
-              <div className="ud-membership-value">{getMemberSinceLabel()}</div>
-            </div>
-
-            {/* Years With Club */}
-            <div className="ud-membership-stat">
-              <div className="ud-membership-icon">
-                <i className="bi bi-people-fill" />
-              </div>
-
-              <div className="ud-membership-label">Years With Club</div>
-
-              <div className="ud-membership-value">
-                {getYearsWithClubLabel()}
-              </div>
+            <div className="ud-id-stat">
+              <p className="ud-id-stat-value">{getJoiningDateLabel()}</p>
+              <p className="ud-id-stat-label">joined</p>
             </div>
           </div>
         </section>
 
         {/* Announcements */}
-        <section className="ud-section-card">
-          <h3 className="ud-section-title">Club announcements</h3>
+        <section className="ud-section">
+          <p className="ud-section-label">Announcements</p>
 
-          <div className="ud-announce-list">
-            {messages.length === 0 ? (
-              <div className="ud-empty-state">No announcements yet.</div>
-            ) : (
-              messages.map((m) => (
-                <div className="ud-announce-item" key={m._id}>
-                  <div className="ud-announce-dot" />
-
-                  <div className="ud-announce-content">
-                    <p className="ud-announce-title">
-                      {m.title || "Announcement"}
-                    </p>
-
-                    <p className="ud-announce-text">
-                      {m.message || m.body || m.text || ""}
-                    </p>
-
-                    <span className="ud-announce-date">
-                      {formatDate(m.createdAt || m.date)}
-                    </span>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
+          {messages.length === 0 ? (
+            <p className="ud-empty-state">No announcements yet.</p>
+          ) : (
+            messages.map((m) => (
+              <div className="ud-announce-item" key={m._id}>
+                <p className="ud-announce-title">{m.title || "Announcement"}</p>
+                <p className="ud-announce-text">
+                  {m.message || m.body || m.text || ""}
+                </p>
+                <span className="ud-announce-date">
+                  {formatDate(m.createdAt || m.date)}
+                </span>
+              </div>
+            ))
+          )}
         </section>
 
         {/* Quick Actions */}
-        <section className="ud-section-card ud-quick-actions">
-          <div className="ud-quick-actions-header">
-            <div>
-              <h3 className="ud-section-title">Quick actions</h3>
-              <p className="ud-section-subtitle">
-                Manage your membership and stay connected
-              </p>
-            </div>
-          </div>
+        <section className="ud-section">
+          <p className="ud-section-label">Quick actions</p>
 
           <div className="ud-actions-grid">
-            {/* Edit Profile */}
-            <Link to="/profile" className="ud-action-card">
-              <span className="ud-action-icon profile">
-                <i className="bi bi-person-lines-fill" />
+            <Link to="/profile" className="ud-action">
+              <span className="ud-action-icon ud-action-icon-primary">
+                <i className="bi bi-person-fill" />
               </span>
-
-              <span className="ud-action-content">
-                <span className="ud-action-title">Edit Profile</span>
-                <span className="ud-action-description">
-                  Update your personal details
-                </span>
-              </span>
-
-              <i className="bi bi-chevron-right ud-action-arrow" />
+              <span className="ud-action-label">Edit profile</span>
             </Link>
 
-            {/* WhatsApp */}
             <a
-              className="ud-action-card"
+              className="ud-action"
               href="https://wa.me/9725720612"
               target="_blank"
               rel="noopener noreferrer"
             >
-              <span className="ud-action-icon whatsapp">
+              <span className="ud-action-icon ud-action-icon-whatsapp">
                 <i className="bi bi-whatsapp" />
               </span>
-
-              <span className="ud-action-content">
-                <span className="ud-action-title">WhatsApp Group</span>
-                <span className="ud-action-description">
-                  Join our club community
-                </span>
-              </span>
-
-              <i className="bi bi-box-arrow-up-right ud-action-arrow" />
+              <span className="ud-action-label">WhatsApp</span>
             </a>
 
-            {/* Contact Admin */}
-            <button
-              className="ud-action-card"
-              onClick={handleViewMembership}
-              type="button"
+            <a
+              className="ud-action"
+              href="https://wa.me/9725720612"
+              target="_blank"
+              rel="noopener noreferrer"
             >
-              <span className="ud-action-icon contact">
+              <span className="ud-action-icon">
                 <i className="bi bi-headset" />
               </span>
+              <span className="ud-action-label">Contact admin</span>
+            </a>
 
-              <span className="ud-action-content">
-                <span className="ud-action-title">Contact Admin</span>
-                <span className="ud-action-description">
-                  Get help from club admin
-                </span>
+            <button
+              className="ud-action"
+              type="button"
+              onClick={handleEnableNotifications}
+            >
+              <span className="ud-action-icon">
+                <i className="bi bi-bell-fill" />
               </span>
-
-              <i className="bi bi-chevron-right ud-action-arrow" />
+              <span className="ud-action-label">Notifications</span>
             </button>
           </div>
         </section>
@@ -430,6 +375,33 @@ export default function UserDashboard() {
           Log out
         </button>
       </aside>
+
+      {/* Notification Permission Modal — mandatory, no dismiss */}
+      {showNotifyBanner && (
+        <>
+          <div className="ud-notify-overlay"></div>
+          <div className="ud-notify-modal" role="dialog" aria-modal="true">
+            <div className="ud-notify-modal-icon">
+              <i className="bi bi-bell-fill" />
+            </div>
+
+            <h3 className="ud-notify-modal-title">Stay in the loop</h3>
+            <p className="ud-notify-modal-text">
+              Turn on notifications to get instant alerts whenever the club
+              posts a new announcement — even when you're not on the site.
+            </p>
+
+            <div className="ud-notify-modal-actions">
+              <button
+                className="ud-notify-modal-btn"
+                onClick={handleEnableNotifications}
+              >
+                Enable notifications
+              </button>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
