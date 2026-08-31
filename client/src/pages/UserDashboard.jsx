@@ -6,14 +6,31 @@ import "./UserDashboard.css";
 
 const API_URL = `${import.meta.env.VITE_API_URL}/api/auth`;
 
+const PLACEHOLDER_EVENTS = [
+  { date: "14", month: "SEP", title: "Ganpati setup", place: "Club grounds" },
+  {
+    date: "28",
+    month: "SEP",
+    title: "Annual sports meet",
+    place: "Sports complex",
+  },
+  { date: "02", month: "OCT", title: "Club gathering", place: "Club grounds" },
+  {
+    date: "18",
+    month: "OCT",
+    title: "Diwali get-together",
+    place: "Club hall",
+  },
+];
+
 export default function UserDashboard() {
   const navigate = useNavigate();
 
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [menuOpen, setMenuOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [showNotifyBanner, setShowNotifyBanner] = useState(false);
+  const [activeView, setActiveView] = useState("home");
 
   useEffect(() => {
     const supported = "Notification" in window;
@@ -75,9 +92,13 @@ export default function UserDashboard() {
     navigate("/login");
   }
 
+  function switchView(view) {
+    setActiveView(view);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
   function formatDate(dateStr) {
     if (!dateStr) return "";
-
     return new Date(dateStr).toLocaleString("en-IN", {
       day: "2-digit",
       month: "short",
@@ -134,6 +155,18 @@ export default function UserDashboard() {
     });
   }
 
+  function getClubYearsRunning() {
+    const founding = new Date(1988, 2, 16);
+    const now = new Date();
+    let years = now.getFullYear() - founding.getFullYear();
+    const hadAnniversary =
+      now.getMonth() > founding.getMonth() ||
+      (now.getMonth() === founding.getMonth() &&
+        now.getDate() >= founding.getDate());
+    if (!hadAnniversary) years -= 1;
+    return years + 1;
+  }
+
   if (loading) {
     return (
       <div className="ud-page">
@@ -151,230 +184,293 @@ export default function UserDashboard() {
     user.isInsured === true ||
     user.insurance?.insured === true;
 
+  const latestMessage = messages[0];
+
   return (
     <div className="ud-page">
-      <main className="ud-wrap">
-        {/* Header */}
-        <header className="ud-dash-header">
-          <button
-            className="ud-icon-btn"
-            onClick={() => setMenuOpen(true)}
-            aria-label="Open menu"
-          >
-            <i className="bi bi-list" />
-          </button>
-
-          <button
-            className="ud-icon-btn"
-            onClick={handleEnableNotifications}
-            aria-label="Notifications"
-          >
-            <i className="bi bi-bell" />
-          </button>
-        </header>
-
-        <p className="ud-greeting-eyebrow">{getGreeting()}</p>
-        <h1 className="ud-greeting-name">{getFirstName(user.fullName)}</h1>
-
-        {/* Membership Card */}
-        <section className="ud-id-card">
-          <p className="ud-id-label">Membership ID</p>
-          <p className="ud-id-value">{user.membershipId || "Pending"}</p>
-
-          <div className="ud-id-stats">
-            <div className="ud-id-stat">
-              <p className="ud-id-stat-value">{getYearsWithClubLabel()}</p>
-              <p className="ud-id-stat-label">year</p>
-            </div>
-            <div className="ud-id-stat">
-              <p className="ud-id-stat-value">
-                {isInsured ? "Active" : "None"}
-              </p>
-              <p className="ud-id-stat-label">insurance</p>
-            </div>
-            <div className="ud-id-stat">
-              <p className="ud-id-stat-value">{getJoiningDateLabel()}</p>
-              <p className="ud-id-stat-label">joined</p>
-            </div>
-          </div>
-        </section>
-
-        {/* Announcements */}
-        <section className="ud-section">
-          <p className="ud-section-label">Announcements</p>
-
-          {messages.length === 0 ? (
-            <p className="ud-empty-state">No announcements yet.</p>
-          ) : (
-            messages.map((m) => (
-              <div className="ud-announce-item" key={m._id}>
-                <p className="ud-announce-title">{m.title || "Announcement"}</p>
-                <p className="ud-announce-text">
-                  {m.message || m.body || m.text || ""}
-                </p>
-                <span className="ud-announce-date">
-                  {formatDate(m.createdAt || m.date)}
-                </span>
-              </div>
-            ))
-          )}
-        </section>
-
-        {/* Quick Actions */}
-        <section className="ud-section">
-          <p className="ud-section-label">Quick actions</p>
-
-          <div className="ud-actions-grid">
-            <Link to="/profile" className="ud-action">
-              <span className="ud-action-icon ud-action-icon-primary">
-                <i className="bi bi-person-fill" />
-              </span>
-              <span className="ud-action-label">Edit profile</span>
-            </Link>
-
-            <a
-              className="ud-action"
-              href="https://wa.me/9725720612"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <span className="ud-action-icon ud-action-icon-whatsapp">
-                <i className="bi bi-whatsapp" />
-              </span>
-              <span className="ud-action-label">WhatsApp</span>
-            </a>
-
-            <a
-              className="ud-action"
-              href="https://wa.me/9725720612"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <span className="ud-action-icon">
-                <i className="bi bi-headset" />
-              </span>
-              <span className="ud-action-label">Contact admin</span>
-            </a>
-
+      <div className="ud-container">
+        {/* Hero */}
+        <header className="ud-hero">
+          <div className="ud-topbar">
+            <span className="ud-brand">KGSC · SINCE 1988</span>
             <button
-              className="ud-action"
-              type="button"
+              className="ud-icon-btn"
               onClick={handleEnableNotifications}
+              aria-label="Notifications"
             >
-              <span className="ud-action-icon">
-                <i className="bi bi-bell-fill" />
-              </span>
-              <span className="ud-action-label">Notifications</span>
+              <i className="bi bi-bell" />
             </button>
           </div>
-        </section>
 
-        <footer className="ud-footer">
-          KAMLABA GARDEN SPORT CLUB — EST. 1988
-        </footer>
-      </main>
+          <div className="ud-hero-copy">
+            <p className="ud-kicker">{getGreeting()}</p>
+            <h1 className="ud-hero-title">
+              Welcome back,
+              <br />
+              {getFirstName(user.fullName)}.
+            </h1>
+          </div>
+        </header>
 
-      {/* Overlay */}
-      {menuOpen && (
-        <div className="ud-overlay" onClick={() => setMenuOpen(false)} />
-      )}
+        <main className="ud-main">
+          {/* HOME */}
+          {activeView === "home" && (
+            <section className="ud-view">
+              <div className="ud-section-head">
+                <p className="ud-section-title">Next on the calendar</p>
+                <button
+                  className="ud-view-all"
+                  onClick={() => switchView("events")}
+                >
+                  VIEW ALL →
+                </button>
+              </div>
 
-      {/* Drawer */}
-      <aside className={`ud-drawer ${menuOpen ? "is-open" : ""}`}>
-        <button
-          className="ud-drawer-close"
-          onClick={() => setMenuOpen(false)}
-          aria-label="Close menu"
-        >
-          <i className="bi bi-x-lg" />
-        </button>
+              <article className="ud-feature">
+                <span className="ud-feature-label">
+                  UPCOMING · {PLACEHOLDER_EVENTS[0].date}{" "}
+                  {PLACEHOLDER_EVENTS[0].month}
+                </span>
+                <div className="ud-feature-date">
+                  {PLACEHOLDER_EVENTS[0].date}{" "}
+                  <span>{PLACEHOLDER_EVENTS[0].month}</span>
+                </div>
+                <h3>{PLACEHOLDER_EVENTS[0].title}</h3>
+                <div className="ud-feature-location">
+                  <i className="bi bi-geo-alt" /> {PLACEHOLDER_EVENTS[0].place}
+                </div>
+              </article>
 
-        <div className="ud-drawer-profile">
-          {user.profilePhotoUrl ? (
-            <img
-              src={user.profilePhotoUrl}
-              alt={user.fullName}
-              className="ud-drawer-photo"
-            />
-          ) : (
-            <div className="ud-drawer-photo ud-drawer-initial">
-              {user.fullName?.charAt(0)?.toUpperCase() || "M"}
-            </div>
+              <div className="ud-secondary">
+                {PLACEHOLDER_EVENTS.slice(1, 3).map((ev, i) => (
+                  <article
+                    key={ev.title}
+                    className={`ud-event-mini ${i === 1 ? "dark" : ""}`}
+                  >
+                    <div className="ud-mini-date">
+                      {ev.date} <span>{ev.month}</span>
+                    </div>
+                    <span className="ud-mini-tag">{ev.title}</span>
+                    <span className="ud-mini-place">{ev.place}</span>
+                  </article>
+                ))}
+              </div>
+
+              <div className="ud-section-head">
+                <p className="ud-section-title">Latest announcement</p>
+              </div>
+
+              {latestMessage ? (
+                <article className="ud-announcement">
+                  <div className="ud-announcement-icon">
+                    <i className="bi bi-megaphone" />
+                  </div>
+                  <div>
+                    <h3>{latestMessage.title || "Announcement"}</h3>
+                    <p>{latestMessage.message || latestMessage.body || ""}</p>
+                    <span className="ud-time">
+                      {formatDate(
+                        latestMessage.createdAt || latestMessage.date,
+                      )}
+                    </span>
+                  </div>
+                </article>
+              ) : (
+                <p className="ud-empty-state">No announcements yet.</p>
+              )}
+
+              <div className="ud-footer">
+                KAMLABA GARDEN SPORT CLUB · EST. 1988
+              </div>
+            </section>
           )}
 
-          <p className="ud-drawer-name">{user.fullName}</p>
+          {/* EVENTS */}
+          {activeView === "events" && (
+            <section className="ud-view">
+              <div className="ud-section-head">
+                <p className="ud-section-title">All upcoming events</p>
+              </div>
 
-          <div className="ud-status-row">
-            <span
-              className={`ud-status-dot ${
-                user.isProfileComplete ? "is-active" : "is-pending"
-              }`}
-            />
-            <span>
-              {user.isProfileComplete
-                ? "Active member"
-                : "Complete your profile"}
-            </span>
-          </div>
-        </div>
-
-        <div className="ud-drawer-section">
-          <p className="ud-drawer-list-label">Profile</p>
-
-          <div className="ud-drawer-list">
-            <Link
-              to="/profile"
-              className="ud-drawer-list-row"
-              onClick={() => setMenuOpen(false)}
-            >
-              <span className="ud-drawer-list-icon">
-                <i className="bi bi-person-lines-fill" />
-              </span>
-
-              <span className="ud-drawer-list-text">
-                <span>Personal details</span>
-                <span className="ud-drawer-list-sub">
-                  {user.isProfileComplete
-                    ? user.email || "Profile details"
-                    : "Add Aadhar, photo & address"}
+              <article className="ud-feature">
+                <span className="ud-feature-label">
+                  UPCOMING · {PLACEHOLDER_EVENTS[0].date}{" "}
+                  {PLACEHOLDER_EVENTS[0].month}
                 </span>
-              </span>
+                <div className="ud-feature-date">
+                  {PLACEHOLDER_EVENTS[0].date}{" "}
+                  <span>{PLACEHOLDER_EVENTS[0].month}</span>
+                </div>
+                <h3>{PLACEHOLDER_EVENTS[0].title}</h3>
+                <div className="ud-feature-location">
+                  <i className="bi bi-geo-alt" /> {PLACEHOLDER_EVENTS[0].place}
+                </div>
+              </article>
 
-              {!user.isProfileComplete && <span className="ud-badge-dot" />}
+              <div className="ud-secondary">
+                {PLACEHOLDER_EVENTS.slice(1).map((ev, i) => (
+                  <article
+                    key={ev.title}
+                    className={`ud-event-mini ${i % 2 === 0 ? "dark" : ""}`}
+                  >
+                    <div className="ud-mini-date">
+                      {ev.date} <span>{ev.month}</span>
+                    </div>
+                    <span className="ud-mini-tag">{ev.title}</span>
+                    <span className="ud-mini-place">{ev.place}</span>
+                  </article>
+                ))}
+              </div>
+            </section>
+          )}
 
-              <i className="bi bi-chevron-right ud-chevron" />
-            </Link>
-          </div>
-        </div>
+          {/* COMMUNITY */}
+          {activeView === "community" && (
+            <section className="ud-view">
+              <div className="ud-section-head">
+                <p className="ud-section-title">Club community</p>
+              </div>
 
-        <div className="ud-drawer-section">
-          <p className="ud-drawer-list-label">Need help?</p>
+              <div className="ud-community-stats">
+                <div className="ud-stat-card">
+                  <div className="ud-stat-num">350+</div>
+                  <div className="ud-stat-label">Members</div>
+                </div>
+                <div className="ud-stat-card">
+                  <div className="ud-stat-num">{getClubYearsRunning()}</div>
+                  <div className="ud-stat-label">Years running</div>
+                </div>
+              </div>
 
-          <div className="ud-drawer-list">
-            <a
-              href="https://wa.me/9725720612"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="ud-drawer-list-row"
-            >
-              <span className="ud-drawer-list-icon">
-                <i className="bi bi-headset" />
-              </span>
+              <a
+                className="ud-whatsapp-cta"
+                href="https://wa.me/9725720612"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <span className="ud-whatsapp-icon">
+                  <i className="bi bi-whatsapp" />
+                </span>
+                <div>
+                  <h4>Join the WhatsApp group</h4>
+                  <p>Stay connected with club updates</p>
+                </div>
+              </a>
 
-              <span className="ud-drawer-list-text">
-                <span>Contact admin</span>
-              </span>
+              <div className="ud-section-head">
+                <p className="ud-section-title">Recent announcements</p>
+              </div>
 
-              <i className="bi bi-chevron-right ud-chevron" />
-            </a>
-          </div>
-        </div>
+              {messages.length === 0 ? (
+                <p className="ud-empty-state">No announcements yet.</p>
+              ) : (
+                messages.map((m) => (
+                  <article className="ud-announcement" key={m._id}>
+                    <div className="ud-announcement-icon">
+                      <i className="bi bi-megaphone" />
+                    </div>
+                    <div>
+                      <h3>{m.title || "Announcement"}</h3>
+                      <p>{m.message || m.body || m.text || ""}</p>
+                      <span className="ud-time">
+                        {formatDate(m.createdAt || m.date)}
+                      </span>
+                    </div>
+                  </article>
+                ))
+              )}
+            </section>
+          )}
 
-        <button className="ud-drawer-logout" onClick={handleLogout}>
-          <i className="bi bi-box-arrow-right" />
-          Log out
-        </button>
-      </aside>
+          {/* PROFILE */}
+          {activeView === "profile" && (
+            <section className="ud-view">
+              <div className="ud-section-head">
+                <p className="ud-section-title">Your membership</p>
+              </div>
+
+              <div className="ud-id-card">
+                <p className="ud-id-label">Membership ID</p>
+                <p className="ud-id-value">{user.membershipId || "Pending"}</p>
+
+                <div className="ud-id-row">
+                  <div className="ud-id-stat">
+                    <b>{getYearsWithClubLabel()}</b>
+                    <span>year</span>
+                  </div>
+                  <div className="ud-id-stat">
+                    <b>{isInsured ? "Active" : "None"}</b>
+                    <span>insurance</span>
+                  </div>
+                  <div className="ud-id-stat">
+                    <b>{getJoiningDateLabel()}</b>
+                    <span>member since</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="ud-profile-actions">
+                <Link to="/profile" className="ud-profile-row">
+                  <i className="bi bi-person-lines-fill" />
+                  <span>Edit profile</span>
+                  <i className="bi bi-chevron-right" />
+                </Link>
+
+                <a
+                  href="https://wa.me/9725720612"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ud-profile-row"
+                >
+                  <i className="bi bi-headset" />
+                  <span>Contact admin</span>
+                  <i className="bi bi-chevron-right" />
+                </a>
+
+                <button
+                  className="ud-profile-row danger"
+                  onClick={handleLogout}
+                >
+                  <i className="bi bi-box-arrow-right" />
+                  <span>Log out</span>
+                </button>
+              </div>
+            </section>
+          )}
+        </main>
+
+        {/* Bottom Nav */}
+        <nav className="ud-nav">
+          <button
+            className={`ud-nav-btn ${activeView === "home" ? "is-active" : ""}`}
+            onClick={() => switchView("home")}
+          >
+            <i className="bi bi-house" />
+            Home
+          </button>
+          <button
+            className={`ud-nav-btn ${activeView === "events" ? "is-active" : ""}`}
+            onClick={() => switchView("events")}
+          >
+            <i className="bi bi-calendar-event" />
+            Events
+          </button>
+          <button
+            className={`ud-nav-btn ${activeView === "community" ? "is-active" : ""}`}
+            onClick={() => switchView("community")}
+          >
+            <i className="bi bi-people" />
+            Community
+          </button>
+          <button
+            className={`ud-nav-btn ${activeView === "profile" ? "is-active" : ""}`}
+            onClick={() => switchView("profile")}
+          >
+            <i className="bi bi-person" />
+            Profile
+          </button>
+        </nav>
+      </div>
 
       {/* Notification Permission Modal — mandatory, no dismiss */}
       {showNotifyBanner && (
