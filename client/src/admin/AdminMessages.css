@@ -60,3 +60,41 @@
   align-items: center;
   gap: 6px;
 }
+
+.msg-mode-tabs {
+  display: flex;
+  gap: 22px;
+  border-bottom: 1.5px solid rgba(22, 35, 58, 0.12);
+}
+
+.msg-mode-tab {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 2px;
+  margin-bottom: -1.5px;
+  border: none;
+  background: none;
+  border-bottom: 2.5px solid transparent;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(17, 18, 13, 0.45);
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.msg-mode-tab i {
+  font-size: 14px;
+}
+
+.msg-mode-tab.is-active {
+  color: var(--forest-900, #11120d);
+  border-bottom-color: var(--marigold-600, #565449);
+  font-weight: 700;
+}
+
+.msg-mode-tab:hover:not(.is-active) {
+  color: rgba(17, 18, 13, 0.65);
+}

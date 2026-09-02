@@ -1,27 +1,13 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { subscribeToPush } from "../lib/pushNotifications.js";
+import {
+  requestNotificationPermission,
+  completePushSubscription,
+} from "../lib/pushNotifications.js";
 import { api } from "../lib/api.js";
 import "./UserDashboard.css";
 
 const API_URL = `${import.meta.env.VITE_API_URL}/api/auth`;
-
-const PLACEHOLDER_EVENTS = [
-  { date: "14", month: "SEP", title: "Ganpati setup", place: "Club grounds" },
-  {
-    date: "28",
-    month: "SEP",
-    title: "Annual sports meet",
-    place: "Sports complex",
-  },
-  { date: "02", month: "OCT", title: "Club gathering", place: "Club grounds" },
-  {
-    date: "18",
-    month: "OCT",
-    title: "Diwali get-together",
-    place: "Club hall",
-  },
-];
 
 export default function UserDashboard() {
   const navigate = useNavigate();
@@ -29,6 +15,7 @@ export default function UserDashboard() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [messages, setMessages] = useState([]);
+  const [events, setEvents] = useState([]);
   const [showNotifyBanner, setShowNotifyBanner] = useState(false);
   const [activeView, setActiveView] = useState("home");
 
@@ -40,9 +27,14 @@ export default function UserDashboard() {
   }, []);
 
   async function handleEnableNotifications() {
-    const success = await subscribeToPush();
-    if (success) {
-      setShowNotifyBanner(false);
+    const permission = await requestNotificationPermission();
+
+    // Modal turant band ho jaaye, chahe allow ho ya deny
+    setShowNotifyBanner(false);
+
+    if (permission === "granted") {
+      // Baaki heavy kaam background mein chale, UI ko wait nahi karana
+      completePushSubscription();
     }
   }
 
@@ -51,6 +43,13 @@ export default function UserDashboard() {
       .get("/api/messages")
       .then((res) => setMessages(res.data?.messages || res.data || []))
       .catch((err) => console.error("Failed to load messages:", err.message));
+  }, []);
+
+  useEffect(() => {
+    api
+      .get("/api/events")
+      .then((res) => setEvents(res.data?.data || res.data || []))
+      .catch((err) => console.error("Failed to load events:", err.message));
   }, []);
 
   useEffect(() => {
@@ -106,6 +105,28 @@ export default function UserDashboard() {
       hour: "2-digit",
       minute: "2-digit",
     });
+  }
+
+  function getEventDay(dateStr) {
+    return String(new Date(dateStr).getDate()).padStart(2, "0");
+  }
+
+  function getEventMonth(dateStr) {
+    return new Date(dateStr)
+      .toLocaleDateString("en-IN", { month: "short" })
+      .toUpperCase();
+  }
+
+  function getDaysLeft(dateStr) {
+    const eventDate = new Date(dateStr);
+    const now = new Date();
+    eventDate.setHours(0, 0, 0, 0);
+    now.setHours(0, 0, 0, 0);
+
+    const diffTime = eventDate - now;
+    const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+    return diffDays;
   }
 
   function getFirstName(name) {
@@ -164,7 +185,7 @@ export default function UserDashboard() {
       (now.getMonth() === founding.getMonth() &&
         now.getDate() >= founding.getDate());
     if (!hadAnniversary) years -= 1;
-    return years + 1;
+    return years;
   }
 
   if (loading) {
@@ -195,20 +216,38 @@ export default function UserDashboard() {
             <span className="ud-brand">KGSC · SINCE 1988</span>
             <button
               className="ud-icon-btn"
-              onClick={handleEnableNotifications}
-              aria-label="Notifications"
+              onClick={handleLogout}
+              aria-label="Log out"
             >
-              <i className="bi bi-bell" />
+              <i className="bi bi-box-arrow-right" />
             </button>
           </div>
 
           <div className="ud-hero-copy">
-            <p className="ud-kicker">{getGreeting()}</p>
-            <h1 className="ud-hero-title">
-              Welcome back,
-              <br />
-              {getFirstName(user.fullName)}.
-            </h1>
+            {activeView === "home" && (
+              <>
+                <p className="ud-kicker">{getGreeting()}</p>
+                <h1 className="ud-hero-title">
+                  Welcome back,
+                  <br />
+                  {getFirstName(user.fullName)}.
+                </h1>
+              </>
+            )}
+
+            {activeView === "events" && (
+              <h1 className="ud-hero-title">
+                All upcoming <br /> events
+              </h1>
+            )}
+
+            {activeView === "community" && (
+              <h1 className="ud-hero-title">Club community</h1>
+            )}
+
+            {activeView === "profile" && (
+              <h1 className="ud-hero-title">Your Profile</h1>
+            )}
           </div>
         </header>
 
@@ -226,35 +265,48 @@ export default function UserDashboard() {
                 </button>
               </div>
 
-              <article className="ud-feature">
-                <span className="ud-feature-label">
-                  UPCOMING · {PLACEHOLDER_EVENTS[0].date}{" "}
-                  {PLACEHOLDER_EVENTS[0].month}
-                </span>
-                <div className="ud-feature-date">
-                  {PLACEHOLDER_EVENTS[0].date}{" "}
-                  <span>{PLACEHOLDER_EVENTS[0].month}</span>
-                </div>
-                <h3>{PLACEHOLDER_EVENTS[0].title}</h3>
-                <div className="ud-feature-location">
-                  <i className="bi bi-geo-alt" /> {PLACEHOLDER_EVENTS[0].place}
-                </div>
-              </article>
-
-              <div className="ud-secondary">
-                {PLACEHOLDER_EVENTS.slice(1, 3).map((ev, i) => (
-                  <article
-                    key={ev.title}
-                    className={`ud-event-mini ${i === 1 ? "dark" : ""}`}
-                  >
-                    <div className="ud-mini-date">
-                      {ev.date} <span>{ev.month}</span>
+              {events.length === 0 ? (
+                <p className="ud-empty-state">No upcoming events.</p>
+              ) : (
+                <>
+                  <article className="ud-feature">
+                    <span className="ud-feature-label">
+                      Day's left · {getDaysLeft(events[0].date)}{" "}
+                      {getDaysLeft(events[0].date) === 1 ? "DAY" : "DAYS"}
+                    </span>
+                    <div className="ud-feature-date">
+                      {getEventDay(events[0].date)}{" "}
+                      <span>{getEventMonth(events[0].date)}</span>
                     </div>
-                    <span className="ud-mini-tag">{ev.title}</span>
-                    <span className="ud-mini-place">{ev.place}</span>
+                    <h3>{events[0].title}</h3>
+                    {events[0].location && (
+                      <div className="ud-feature-location">
+                        <i className="bi bi-geo-alt" /> {events[0].location}
+                      </div>
+                    )}
                   </article>
-                ))}
-              </div>
+
+                  {events.length > 1 && (
+                    <div className="ud-secondary">
+                      {events.slice(1, 3).map((ev, i) => (
+                        <article
+                          key={ev._id}
+                          className={`ud-event-mini ${i === 1 ? "dark" : ""}`}
+                        >
+                          <div className="ud-mini-date">
+                            {getEventDay(ev.date)}{" "}
+                            <span>{getEventMonth(ev.date)}</span>
+                          </div>
+                          <span className="ud-mini-tag">{ev.title}</span>
+                          {ev.location && (
+                            <span className="ud-mini-place">{ev.location}</span>
+                          )}
+                        </article>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
 
               <div className="ud-section-head">
                 <p className="ud-section-title">Latest announcement</p>
@@ -278,58 +330,63 @@ export default function UserDashboard() {
               ) : (
                 <p className="ud-empty-state">No announcements yet.</p>
               )}
-
-              <div className="ud-footer">
-                KAMLABA GARDEN SPORT CLUB · EST. 1988
-              </div>
             </section>
           )}
 
           {/* EVENTS */}
           {activeView === "events" && (
             <section className="ud-view">
-              <div className="ud-section-head">
-                <p className="ud-section-title">All upcoming events</p>
-              </div>
+              <div className="ud-section-head"></div>
 
-              <article className="ud-feature">
-                <span className="ud-feature-label">
-                  UPCOMING · {PLACEHOLDER_EVENTS[0].date}{" "}
-                  {PLACEHOLDER_EVENTS[0].month}
-                </span>
-                <div className="ud-feature-date">
-                  {PLACEHOLDER_EVENTS[0].date}{" "}
-                  <span>{PLACEHOLDER_EVENTS[0].month}</span>
-                </div>
-                <h3>{PLACEHOLDER_EVENTS[0].title}</h3>
-                <div className="ud-feature-location">
-                  <i className="bi bi-geo-alt" /> {PLACEHOLDER_EVENTS[0].place}
-                </div>
-              </article>
-
-              <div className="ud-secondary">
-                {PLACEHOLDER_EVENTS.slice(1).map((ev, i) => (
-                  <article
-                    key={ev.title}
-                    className={`ud-event-mini ${i % 2 === 0 ? "dark" : ""}`}
-                  >
-                    <div className="ud-mini-date">
-                      {ev.date} <span>{ev.month}</span>
+              {events.length === 0 ? (
+                <p className="ud-empty-state">No upcoming events.</p>
+              ) : (
+                <>
+                  <article className="ud-feature">
+                    <span className="ud-feature-label">
+                      UPCOMING · {getEventDay(events[0].date)}{" "}
+                      {getEventMonth(events[0].date)}
+                    </span>
+                    <div className="ud-feature-date">
+                      {getEventDay(events[0].date)}{" "}
+                      <span>{getEventMonth(events[0].date)}</span>
                     </div>
-                    <span className="ud-mini-tag">{ev.title}</span>
-                    <span className="ud-mini-place">{ev.place}</span>
+                    <h3>{events[0].title}</h3>
+                    {events[0].location && (
+                      <div className="ud-feature-location">
+                        <i className="bi bi-geo-alt" /> {events[0].location}
+                      </div>
+                    )}
                   </article>
-                ))}
-              </div>
+
+                  {events.length > 1 && (
+                    <div className="ud-secondary">
+                      {events.slice(1).map((ev, i) => (
+                        <article
+                          key={ev._id}
+                          className={`ud-event-mini ${i % 2 === 0 ? "dark" : ""}`}
+                        >
+                          <div className="ud-mini-date">
+                            {getEventDay(ev.date)}{" "}
+                            <span>{getEventMonth(ev.date)}</span>
+                          </div>
+                          <span className="ud-mini-tag">{ev.title}</span>
+                          {ev.location && (
+                            <span className="ud-mini-place">{ev.location}</span>
+                          )}
+                        </article>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
             </section>
           )}
 
           {/* COMMUNITY */}
           {activeView === "community" && (
             <section className="ud-view">
-              <div className="ud-section-head">
-                <p className="ud-section-title">Club community</p>
-              </div>
+              <div className="ud-section-head"></div>
 
               <div className="ud-community-stats">
                 <div className="ud-stat-card">
@@ -337,7 +394,9 @@ export default function UserDashboard() {
                   <div className="ud-stat-label">Members</div>
                 </div>
                 <div className="ud-stat-card">
-                  <div className="ud-stat-num">{getClubYearsRunning()}</div>
+                  <div className="ud-stat-num">
+                    {getClubYearsRunning() + "+"}
+                  </div>
                   <div className="ud-stat-label">Years running</div>
                 </div>
               </div>
@@ -385,9 +444,7 @@ export default function UserDashboard() {
           {/* PROFILE */}
           {activeView === "profile" && (
             <section className="ud-view">
-              <div className="ud-section-head">
-                <p className="ud-section-title">Your membership</p>
-              </div>
+              <div className="ud-section-head"></div>
 
               <div className="ud-id-card">
                 <p className="ud-id-label">Membership ID</p>
@@ -463,8 +520,8 @@ export default function UserDashboard() {
             Community
           </button>
           <button
-            className={`ud-nav-btn ${activeView === "profile" ? "is-active" : ""}`}
-            onClick={() => switchView("profile")}
+            className="ud-nav-btn"
+            onClick={() => navigate("/dashboard/profile")}
           >
             <i className="bi bi-person" />
             Profile
@@ -481,7 +538,7 @@ export default function UserDashboard() {
               <i className="bi bi-bell-fill" />
             </div>
 
-            <h3 className="ud-notify-modal-title">Stay in the loop</h3>
+            <h3 className="ud-notify-modal-title">Stay Connected with Us</h3>
             <p className="ud-notify-modal-text">
               Turn on notifications to get instant alerts whenever the club
               posts a new announcement — even when you're not on the site.

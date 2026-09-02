@@ -25,6 +25,7 @@ app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/messages", require("./routes/messageRoutes"));
+app.use("/api/events", require("./routes/eventRoutes"));
 app.use("/api/transactions", require("./routes/transactionRoutes"));
 app.use("/api/manager", require("./routes/managerRoutes"));
 app.use("/api/push", require("./routes/pushRoutes"));

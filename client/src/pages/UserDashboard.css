@@ -277,11 +277,11 @@
 .ud-announcement {
   display: flex;
   gap: 12px;
-  padding: 16px;
+  padding: 16px !important;
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 20px;
-  margin-bottom: 12px;
+  border-radius: 20px !important;
+  margin-bottom: 12px !important;
 }
 
 .ud-announcement-icon {
@@ -562,4 +562,10 @@
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
+}
+
+.ud-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }

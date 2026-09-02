@@ -13,7 +13,7 @@ const FORGOT_RESET_URL = `${API_URL}/forgot-password/reset`;
 export default function Login() {
   const navigate = useNavigate();
 
-  const [tab, setTab] = useState("login");
+  const [tab, setTab] = useState("signup"); 
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState("");
 
@@ -438,12 +438,12 @@ export default function Login() {
             >
               <div className="field">
                 <label htmlFor="loginIdentifier">
-                  Phone number or Member ID
+                  Phone number
                 </label>
                 <input
                   id="loginIdentifier"
                   type="text"
-                  placeholder="e.g. 98765 43210 or KGSC-0001"
+                  placeholder="98765 - 43210"
                   autoComplete="username"
                   value={loginData.identifier}
                   onChange={(e) =>
