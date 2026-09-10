@@ -63,8 +63,7 @@
 .pf-card {
     background: var(--paper);
     border: 1px solid var(--line);
-    /* border-radius: var(--radius-lg); */
-    padding: 26px 22px;
+    padding: 26px 22px 0px 22px;
     box-shadow: var(--shadow-soft);
 }
 

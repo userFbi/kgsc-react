@@ -422,7 +422,7 @@ export default function Login() {
               : tab === "forgot"
                 ? "Reset your password"
                 : signupStep === 1
-                  ? "Verify your email"
+                  ? "Create your account"
                   : "Enter your details"}
           </h2>
 
