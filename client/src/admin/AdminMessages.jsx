@@ -155,7 +155,6 @@ export default function AdminMessages() {
             ></i>{" "}
             {mode === "message" ? "New message" : "New event"}
           </h2>
-<br />
           <div className="msg-mode-tabs">
             <button
               type="button"
