@@ -25,9 +25,9 @@
 }
 
 .ud-container {
-  max-width: 480px;
   margin: 0 auto;
   min-height: 100vh;
+  /* max-width: 480px; */
   display: flex;
   flex-direction: column;
   padding-bottom: 76px;
@@ -232,8 +232,8 @@
   gap: 10px;
   margin-bottom: 25px;
 }
-.ud-secondary article{
-  padding: 10px;  
+.ud-secondary article {
+  padding: 10px;
 }
 .ud-event-mini {
   min-height: 120px;
@@ -473,7 +473,7 @@
   left: 50%;
   transform: translateX(-50%);
   width: 100%;
-  max-width: 480px;
+  /* max-width: 480px; */
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   padding: 11px 10px 14px;
