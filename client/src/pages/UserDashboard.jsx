@@ -403,7 +403,7 @@ export default function UserDashboard() {
 
               <a
                 className="ud-whatsapp-cta"
-                href="https://wa.me/9725720612"
+                href="https://chat.whatsapp.com/DXzpHhl59qFLFUoi2vg0m0?s=cl&p=a&mlu=4&ilr=4"
                 target="_blank"
                 rel="noopener noreferrer"
               >
